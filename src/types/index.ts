@@ -1,0 +1,876 @@
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  avatar_url?: string;
+  roles?: string[];
+}
+
+export interface Stadium {
+  id: string;
+  name: string;
+  capacity: number;
+  city?: string;
+  country?: string | { id: string; name: string; code?: string; flag_url?: string } | null;
+  pitch_type?: string;
+}
+
+export interface Facility {
+  id: string;
+  name: string;
+  code: string;
+  current_level: number;
+  status: string;
+  upgrade_cost?: number;
+}
+
+export interface Club {
+  founded_year?: number;
+  country_id?: string;
+  current_competition_id?: string;
+  country_detail?: {
+    id: string;
+    name: string;
+    code?: string;
+    flag_url?: string;
+    confederation_id?: string;
+    confederation?: {
+      id: string;
+      name: string;
+      code: string;
+    } | null;
+  } | null;
+  confederation?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+  id: string;
+  name: string;
+  short_name?: string;
+  country?: string;
+  countryFlag?: string;
+  city?: string;
+  reputation: number;
+  ranking_points: number;
+  world_rank?: number;
+  logo_url?: string;
+  home_kit_url?: string | null;
+  away_kit_url?: string | null;
+  stadium?: (Stadium & { condition?: number; image_url?: string | null }) | null;
+  stadiums?: Stadium[];
+  manager?: {
+    id: string;
+    username: string;
+    email?: string;
+    avatar_url?: string | null;
+    created_at?: string;
+    status?: string;
+  } | null;
+  isAiManaged?: boolean;
+  current_competition?: {
+    id: string;
+    name: string;
+    code: string;
+    tier: number;
+    competition_type: string;
+  } | null;
+  finances?: {
+    cash: number;
+    gold: number;
+  } | null;
+  financial_accounts?: Array<{
+    cash_balance: number;
+    gold_balance: number;
+  }>;
+  squadCount?: number;
+  trophiesCount?: number;
+  avgOvr?: number;
+  facilities?: Facility[];
+  club_facilities?: Facility[];
+}
+
+export interface PlayerPosition {
+  id?: string;
+  position_code?: string;
+  is_preferred?: boolean;
+  ability?: number;
+  position?: {
+    code: string;
+    name: string;
+  };
+  positions?: {
+    code: string;
+    name?: string;
+  };
+}
+
+export interface PlayerStatus {
+  condition?: number;
+  fitness?: number;
+  form?: number;
+  morale?: number;
+  is_injured: boolean;
+  is_suspended: boolean;
+  is_transfer_listed: boolean;
+  is_loan_listed: boolean;
+  asking_price?: number;
+}
+
+export interface Player {
+  id: string;
+  name?: string;
+  common_name?: string;
+  first_name: string;
+  last_name: string;
+  age: number;
+  nationality?: string | { id: string; name: string; code?: string; flag_url?: string } | null;
+  nationalityFlag?: string;
+  reputation?: number;
+  overall_rating?: number;
+  ovr?: number;
+  potential_rating?: number;
+  potential?: number;
+  experience?: any;
+  market_value?: number;
+  club_id?: string;
+  club?: {
+    id: string;
+    name: string;
+    logo_url?: string;
+  };
+  squad_type?: string;
+  squad_number?: number;
+  photo_url?: string;
+  is_on_loan?: boolean;
+  parent_club?: {
+    id: string;
+    name: string;
+    logo_url?: string;
+  } | null;
+  player_positions?: PlayerPosition[];
+  position?: {
+    code: string;
+    name: string;
+  } | null;
+  status?: PlayerStatus | null;
+  player_status?: PlayerStatus | null;
+  player_attributes?: Record<string, any> | null;
+  attributes?: Record<string, any> | null;
+  player_financial_data?: {
+    market_value?: number;
+    wage?: number;
+  };
+  contract?: PlayerContractDetail | null;
+}
+
+export interface PlayerContractDetail {
+  id?: string;
+  club_id?: string;
+  club_name?: string;
+  club_logo?: string;
+  salary: number;
+  weekly_wage?: number;
+  wage?: number;
+  squad_role?: string;
+  status?: string;
+  start_date?: string;
+  end_date?: string | null;
+  start_season_id?: number;
+  start_season_day?: number;
+  end_season_id?: number;
+  end_season_day?: number;
+  signing_bonus?: number;
+  release_clause?: number;
+  is_loan_contract?: boolean;
+  parent_club_id?: string | null;
+  parent_club_name?: string | null;
+  parent_club_logo?: string | null;
+  current_season?: number;
+  remaining_seasons?: number;
+}
+
+export interface FormationPosition {
+  id: string;
+  slot_code: string;
+  x: number;
+  y: number;
+  order_no: number;
+  positions?: {
+    code: string;
+    name: string;
+  };
+}
+
+export interface Formation {
+  id: string;
+  name: string;
+  code: string;
+  defense_count: number;
+  midfield_count: number;
+  forward_count: number;
+  formation_positions: FormationPosition[];
+}
+
+export interface MatchEvent {
+  id: string;
+  minute: number;
+  eventType: string;
+  clubId?: string;
+  player?: { id: string; name: string };
+  relatedPlayer?: { id: string; name: string };
+  metadata?: { description: string };
+}
+
+export interface Match {
+  id: string;
+  season_day: number;
+  match_date: string;
+  kickoff_time: string;
+  status: 'SCHEDULED' | 'FINISHED';
+  competitionSeason?: { id: string; name: string } | null;
+  stage?: { id: string; name: string } | null;
+  round?: { id: string; name: string; round_no: number } | null;
+  homeScore?: number;
+  awayScore?: number;
+  attendance?: number;
+  ticketRevenue?: number;
+  stadium?: { id: string; name: string; capacity: number } | string;
+  homeClub: { id: string; name: string; logo_url?: string };
+  awayClub: { id: string; name: string; logo_url?: string };
+  events?: MatchEvent[];
+}
+
+export interface Competition {
+  id: string;
+  name: string;
+  code?: string;
+  displayName?: string;
+  groupLabel?: string;
+  regionName?: string;
+  scope?: 'DOMESTIC' | 'CONTINENTAL' | 'INTERNATIONAL' | 'REGIONAL';
+  type?: string;
+  formatType?: 'LEAGUE' | 'KNOCKOUT' | 'GROUP_KNOCKOUT';
+  formatLabel?: string;
+  tier?: number;
+  total_teams?: number;
+  logo_url?: string;
+  country_id?: string | null;
+  confederation_id?: string | null;
+  country?: { id: string; name: string; code?: string; flag_url?: string } | null;
+  confederation?: { id: string; name: string; code?: string } | null;
+}
+
+export interface GroupStandings {
+  id: string;
+  name: string;
+  orderNo?: number;
+  standings: StandingItem[];
+}
+
+export interface KnockoutClub {
+  id: string;
+  name: string;
+  short_name?: string;
+  logo_url?: string;
+}
+
+export interface KnockoutMatch {
+  id: string;
+  seasonDay: number;
+  matchDate?: string | null;
+  kickoffTime?: string;
+  status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | string;
+  groupName?: string | null;
+  homeClub: KnockoutClub | null;
+  awayClub: KnockoutClub | null;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  homePenaltyScore?: number | null;
+  awayPenaltyScore?: number | null;
+  resultType?: string;
+  winnerClubId?: string | null;
+}
+
+export interface KnockoutRound {
+  roundName: string;
+  roundOrder: number;
+  seasonDay: number;
+  matches: KnockoutMatch[];
+}
+
+export interface KnockoutBracketResponse {
+  competitionId: string;
+  competitionName: string;
+  seasonName: string;
+  totalMatches: number;
+  rounds: KnockoutRound[];
+}
+
+export interface Standing {
+  id?: string;
+  club_id: string;
+  club?: { id: string; name: string; short_name?: string; logo_url?: string };
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+  points: number;
+}
+
+export interface StandingItem extends Standing {
+  position: number;
+  wins: number;
+  draws: number;
+  losses: number;
+}
+
+export interface PlayerStat {
+  player: {
+    id: string;
+    name?: string;
+    common_name?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+  club?: {
+    id: string;
+    name: string;
+  };
+  goals?: number;
+  assists?: number;
+}
+
+export interface TransferOffer {
+  id: string;
+  player_id: string;
+  player?: (Omit<Player, 'position' | 'photo_url'> & {
+    photo_url?: string | null;
+    position?: string;
+    flag_url?: string | null;
+  }) | null;
+  from_club_id?: string;
+  to_club_id?: string;
+  buyer_club_id?: string;
+  buyer_club?: { id: string; name: string; logo_url?: string | null } | null;
+  seller_club_id?: string;
+  seller_club?: { id: string; name: string; logo_url?: string | null } | null;
+  from_club?: { id: string; name: string; logo_url?: string | null } | null;
+  to_club?: { id: string; name: string; logo_url?: string | null } | null;
+  offer_amount: number;
+  proposed_wage?: number;
+  contract_years?: number;
+  is_loan?: boolean;
+  transfer_type?: string;
+  currency_type?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED';
+  created_at?: string;
+  season_number?: number | null;
+  season_day?: number | null;
+}
+
+export interface FinancialAccount {
+  id?: string;
+  club_id: string;
+  cash_balance: number;
+  gold_balance: number;
+}
+
+export interface LedgerTransaction {
+  id: string;
+  club_id: string;
+  transaction_type: string;
+  amount: number;
+  balance_after: number;
+  description?: string;
+  created_at: string;
+}
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  gold_cost: number;
+  cash_reward: number;
+  is_active?: boolean;
+}
+
+export interface TrainingType {
+  id: string;
+  name: string;
+  description?: string;
+  attribute_focus?: string;
+  intensity?: number;
+}
+
+export interface TrainingSession {
+  id: string;
+  club_id: string;
+  training_type_id: string;
+  training_type?: TrainingType;
+  intensity: number;
+  session_date: string;
+}
+
+export interface TimelineData {
+  world: { id: string; name: string; status: string };
+  season: {
+    id: string;
+    name: string;
+    season_number: number;
+    current_day: number;
+    total_days: number;
+    is_transfer_window_open: boolean;
+    status: string;
+  };
+}
+
+
+export interface StarterCountry {
+  id: string;
+  name: string;
+  code: string;
+  flag_url: string | null;
+  unclaimed_clubs: number;
+}
+
+export interface StarterTier {
+  tier: number;
+  competition_name: string;
+  unclaimed_count: number;
+}
+
+export interface PlayerSkillItem {
+  id?: string;
+  code: string;
+  name: string;
+  value: number;
+  potential_value?: number;
+  growth?: string | null;
+  category?: string;
+  description?: string;
+  is_key?: boolean;
+  multiplier?: number;
+  order_no?: number;
+}
+
+export interface PlayerQualityProgressItem {
+  age: number;
+  season: string;
+  quality: number;
+}
+
+export interface PlayerSkillsData {
+  left_column: PlayerSkillItem[];
+  right_column: PlayerSkillItem[];
+  key_attributes?: PlayerSkillItem[];
+  all_attributes?: PlayerSkillItem[];
+  categories?: {
+    physical: PlayerSkillItem[];
+    technical: PlayerSkillItem[];
+    mental: PlayerSkillItem[];
+    goalkeeping: PlayerSkillItem[];
+  };
+  total_skills: number;
+  total_all_skills?: number;
+  average_quality: number;
+  quality_progress: PlayerQualityProgressItem[];
+}
+
+export interface PlayerMatchItem {
+  day: number;
+  opponent: string;
+  opponent_logo?: string | null;
+  result: string;
+  outcome: 'WIN' | 'DRAW' | 'LOSS';
+  minutes: number;
+  saves_or_tackles: number;
+  key_ass: string;
+  shot_goal: string;
+  rating: number;
+}
+
+export interface PlayerMatchesData {
+  total: number;
+  missed: number;
+  missed_pct: string;
+  list: PlayerMatchItem[];
+}
+
+export interface PlayerCareerSeasonItem {
+  season: string;
+  team: string;
+  matches: number;
+  minutes: number;
+  clean_sheets: number;
+  goals: number;
+  assists: number;
+  yellow_cards?: number;
+  red_cards?: number;
+  cards: string;
+  motm: number;
+  rating: number;
+  avg_quality?: number;
+}
+
+export interface PlayerStatisticsData {
+  career_totals: {
+    matches: number;
+    minutes: number;
+    clean_sheets: number;
+    goals: number;
+    assists: number;
+    cards: string;
+    motm: number;
+    rating: number;
+  };
+  seasons: PlayerCareerSeasonItem[];
+}
+
+export interface PlayerTransferItem {
+  from_team: string;
+  to_team: string;
+  season: string;
+  avg_quality: number;
+  bid_value: string;
+  type: string;
+}
+
+export interface PlayerTransfersData {
+  history: PlayerTransferItem[];
+  potential_upgrades?: any[];
+}
+
+export interface PlayerInjuryItem {
+  id: string;
+  injury_name: string;
+  category: string;
+  severity: string;
+  days_missed: number;
+  days_remaining?: number;
+  season: string;
+  start_date: string;
+  status: 'ACTIVE' | 'RECOVERED';
+}
+
+export interface PlayerInjuriesData {
+  current?: any;
+  history: PlayerInjuryItem[];
+}
+
+export interface PlayerDetailData extends Player {
+  is_own_club?: boolean;
+  can_view_confidential?: boolean;
+  is_on_loan?: boolean;
+  on_loan?: {
+    is_loan: boolean;
+    borrowing_club_id?: string;
+    borrowing_club_name?: string;
+    borrowing_club_logo?: string;
+    parent_club_id?: string | null;
+    parent_club_name?: string | null;
+    parent_club_logo?: string | null;
+    end_season_id?: number;
+  } | null;
+  date_of_birth?: string | Date | null;
+  nationality_detail?: {
+    id: string;
+    name: string;
+    code?: string;
+    flag_url?: string;
+  } | null;
+  height?: string;
+  weight?: string;
+  preferred_foot?: string;
+  active_injury?: {
+    injury_type: string;
+    severity: string;
+    days_remaining: number;
+    expected_return_date?: string;
+  } | null;
+  birthday_text?: string;
+  worth_display?: string;
+  weekly_wage?: number;
+  weekly_wages_display?: string;
+  discipline?: {
+    status: 'CLEAN' | 'WARNING' | 'SUSPENDED';
+    label: string;
+    yellow_cards: number;
+    is_suspended: boolean;
+  };
+  fatigue?: {
+    condition: number;
+    percentage: number;
+    label: string;
+  };
+  experience?: any;
+  average_quality?: number;
+  primary_position?: {
+    code: string;
+    name: string;
+  };
+  skills?: PlayerSkillsData;
+  matches?: PlayerMatchesData;
+  statistics?: PlayerStatisticsData;
+  transfers?: PlayerTransfersData;
+  injuries_tab?: PlayerInjuriesData;
+}
+
+export interface DashboardData {
+  club: {
+    id: string;
+    name: string;
+    short_name?: string;
+    logo_url?: string;
+    country: string;
+    country_code: string;
+    flag_url?: string;
+    reputation: number;
+    popularity: number;
+    team_morale: number;
+    avg_ovr: number;
+    players_count: number;
+    cash: number;
+    gold: number;
+    league_rank: number;
+    league_points: number;
+    trophies_count?: number;
+    tier_label: string;
+    competition_name: string;
+  };
+  next_match?: {
+    id: string;
+    competition_name: string;
+    season_day: number;
+    match_date: string;
+    kickoff_time: string;
+    status: string;
+    is_home: boolean;
+    countdown_hours: number;
+    opponent: {
+      id?: string;
+      name: string;
+      short_name?: string;
+      logo_url?: string | null;
+      is_home: boolean;
+    };
+    home_club: {
+      id?: string;
+      name: string;
+      logo_url?: string | null;
+    };
+    away_club: {
+      id?: string;
+      name: string;
+      logo_url?: string | null;
+    };
+  } | null;
+  last_match?: {
+    id?: string;
+    competition_name: string;
+    home_club_id?: string;
+    home_club_name?: string;
+    away_club_id?: string;
+    away_club_name?: string;
+    home_score: number;
+    away_score: number;
+  } | null;
+  competitions: Array<{
+    id: string;
+    name: string;
+    competition_type?: string;
+    tier?: number;
+    type: string;
+    color: string;
+    icon: string;
+    sub_title: string;
+    country_name?: string;
+    country_code?: string;
+    rank?: number;
+    points?: number;
+    played?: number;
+    round_label?: string;
+    status_label: string;
+  }>;
+  metrics: {
+    avg_ovr: number;
+    players_count: number;
+    team_morale: number;
+  };
+  timeline?: {
+    season_number: number;
+    current_day: number;
+    total_days: number;
+  };
+  recent_news?: ClubNews[];
+}
+
+export interface ClubNews {
+  id: string;
+  club_id: string;
+  season_id?: string | null;
+  news_type: string;
+  title: string;
+  thumbnail_url?: string | null;
+  content?: string | null;
+  published_at?: string | null;
+}
+
+
+export interface ClubTrophy {
+  id: string;
+  club_id: string;
+  competition_id: string;
+  competition_name: string;
+  season_id: string;
+  season_number: number;
+  title_type: 'CHAMPION' | 'RUNNER_UP' | 'THIRD_PLACE' | string;
+  trophy_name: string;
+  trophy_url?: string | null;
+  rank_position: number;
+  achieved_at: string;
+}
+
+export interface ClubSquadGroupsResponse {
+  firstTeam: Player[];
+  youthTeam: Player[];
+  totalPlayers: number;
+  firstTeamCount: number;
+  youthTeamCount: number;
+}
+
+export interface ClubMatchItem {
+  id: string;
+  season_day: number;
+  match_date: string;
+  kickoff_time: string;
+  status: string;
+  is_home: boolean;
+  home_team: {
+    id: string;
+    name: string;
+    short_name?: string;
+    logo_url?: string;
+  };
+  away_team: {
+    id: string;
+    name: string;
+    short_name?: string;
+    logo_url?: string;
+  };
+  opponent: {
+    id: string;
+    name: string;
+    short_name?: string;
+    logo_url?: string;
+  };
+  home_score?: number | null;
+  away_score?: number | null;
+  result?: 'W' | 'D' | 'L' | null;
+  competition_name: string;
+  competition_type?: string;
+  stadium_name: string;
+}
+
+export interface ClubTransferItem {
+  id: string;
+  transfer_type: string;
+  is_loan: boolean;
+  transfer_fee: number;
+  currency_type: string;
+  transfer_date: string;
+  season_number: number;
+  season_day?: number | null;
+  player: {
+    id: string;
+    name: string;
+    age: number;
+    ovr: number;
+    photo_url?: string | null;
+    position: string;
+    nationalityFlag?: string | null;
+  };
+  other_club: {
+    id: string;
+    name: string;
+    logo_url?: string | null;
+  };
+}
+
+export interface ClubTransfersResponse {
+  arrivals: ClubTransferItem[];
+  departures: ClubTransferItem[];
+  totalTransfers: number;
+  totalSpend: number;
+  totalIncome: number;
+}
+
+export interface ClubSeasonRecord {
+  id: string;
+  season_id: string;
+  season_number: number;
+  competition_id: string;
+  competition_name: string;
+  competition_type: string;
+  tier: number;
+  position: number;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+  points: number;
+  achievement: string;
+  achievement_label: string;
+}
+
+export interface ClubSeasonHistoryResponse {
+  trophies: ClubTrophy[];
+  seasons: ClubSeasonRecord[];
+  totalTrophies: number;
+  championshipsCount: number;
+}
+
+export interface ClubFacilityItem {
+  id: string;
+  type_id: string;
+  code: string;
+  name: string;
+  description: string;
+  level: number;
+  max_level: number;
+  level_name: string;
+  cost: number;
+  upgrade_days: number;
+  next_cost?: number | null;
+  next_upgrade_days?: number | null;
+  status: string;
+  icon?: string;
+  badgeColor?: string;
+  effect?: string;
+}
+
+export interface ClubStadiumResponse {
+  id: string;
+  club_id: string;
+  name: string;
+  capacity: number;
+  condition: number;
+  image_url?: string | null;
+  pitch_type: string;
+  lighting_system: string;
+  stands: Array<{
+    name: string;
+    capacity: number;
+    vipSeats: number;
+    covered: boolean;
+  }>;
+  avgAttendanceThisSeason: number;
+  totalMatchesHosted: number;
+  facilities?: ClubFacilityItem[];
+}
+

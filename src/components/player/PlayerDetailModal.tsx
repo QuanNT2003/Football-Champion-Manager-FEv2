@@ -1,0 +1,1031 @@
+import { useTranslation } from '../../i18n';
+﻿import { ConfirmModal } from '../common/ConfirmModal';
+import { PlayerSkillsTab } from './PlayerSkillsTab';
+import { PlayerMatchesTab } from './PlayerMatchesTab';
+import { PlayerStatsTab } from './PlayerStatsTab';
+import { PlayerTransfersTab } from './PlayerTransfersTab';
+import { PlayerInjuriesTab } from './PlayerInjuriesTab';
+import { PlayerOfferTab } from './PlayerOfferTab';
+import { PlayerContractTab } from './PlayerContractTab';
+import { RenewContractModal } from '../common/RenewContractModal';
+import React, { useState, useEffect } from 'react';
+import { Player, PlayerDetailData } from '../../types';
+import { formatCurrency, formatNumber, getFacepackUrl } from '../../utils/formatters';
+import { playersApi } from '../../services/players.service';
+import { transfersApi } from '../../services/transfers.service';
+import {
+  X,
+  ChevronLeft,
+  Zap,
+  ChevronRight,
+  Star,
+  Edit2,
+  Coins,
+  Shield,
+  Award,
+  AlertCircle,
+  HelpCircle,
+  Plus,
+  ArrowRight,
+  Activity,
+  HeartPulse,
+  CheckCircle2,
+  FileText,
+  Sparkles,
+  Loader2,
+} from 'lucide-react';
+
+
+export interface Props {
+  player: Player;
+  playersList?: Player[];
+  currentClubId?: string;
+  cashBalance?: number;
+  initialTab?: 'skills' | 'matches' | 'statistics' | 'transfers' | 'injuries' | 'offer' | 'contract';
+  onClose: () => void;
+  onSelectPlayer?: (player: Player) => void;
+  onPlayerUpdated?: () => void;
+  onOfferSuccess?: () => void;
+}
+
+export const PlayerDetailModal: React.FC<Props> = ({
+
+  player,
+  playersList = [],
+  currentClubId,
+  cashBalance,
+  initialTab,
+  onClose,
+  onSelectPlayer,
+  onPlayerUpdated,
+  onOfferSuccess,
+}) => {
+  const { t } = useTranslation();
+  const [detail, setDetail] = useState<PlayerDetailData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isMovingSquad, setIsMovingSquad] = useState<boolean>(false);
+
+  const handleDirectMoveSquad = async () => {
+    const currentSquadType = detail?.squad_type || player.squad_type;
+    const isCurrentFirstTeam = !currentSquadType || currentSquadType === 'FIRST_TEAM';
+    const targetSquad: 'FIRST_TEAM' | 'YOUTH_U21' = isCurrentFirstTeam ? 'YOUTH_U21' : 'FIRST_TEAM';
+
+    setIsMovingSquad(true);
+    try {
+      const res = await playersApi.moveSquad(player.id, targetSquad);
+      if (detail) {
+        setDetail({
+          ...detail,
+          squad_type: res.player?.squad_type || targetSquad,
+          squad_number: res.player?.squad_number || detail.squad_number,
+        });
+      }
+      onPlayerUpdated?.();
+    } catch (err: any) {
+      console.error('Failed to move player squad:', err);
+      alert(err.response?.data?.message || err.message || t('squad.modal_move_failed', 'Không thể điều chuyển đội hình'));
+    } finally {
+      setIsMovingSquad(false);
+    }
+  };
+
+  // Kiểm tra cầu thủ có thuộc CLB của người dùng không (ưu tiên cờ is_own_club từ BE nếu đã fetch detail)
+  const isOwnClub = detail?.is_own_club !== undefined
+    ? Boolean(detail.is_own_club)
+    : Boolean(
+        currentClubId && (
+          String(player.club_id) === String(currentClubId) ||
+          String((player as any).currentClub?.id) === String(currentClubId) ||
+          String((player as any).club?.id) === String(currentClubId) ||
+          (detail?.club?.id ? String(detail.club.id) === String(currentClubId) : false)
+        )
+      );
+
+  // Kiểm tra cầu thủ có đang trong diện chuyển nhượng (bán / mượn / tự do) không
+  const isTransferListed = Boolean(
+    (player as any).is_transfer_listed ||
+    player.player_status?.is_transfer_listed ||
+    detail?.status?.is_transfer_listed
+  );
+
+  const isLoanListed = Boolean(
+    (player as any).is_loan_listed ||
+    player.player_status?.is_loan_listed ||
+    detail?.status?.is_loan_listed
+  );
+
+  const isFreeAgent = Boolean(
+    (player as any).is_free_agent ||
+    (!player.club_id && !(player as any).currentClub?.id && !(player as any).club?.id) ||
+    (detail !== null && !detail.club)
+  );
+
+  // Chỉ hiển thị tab Offer khi: Cầu thủ KHÔNG thuộc CLB của mình VÀ đang trong diện chuyển nhượng
+  const isEligibleForOffer = !isOwnClub && (isTransferListed || isLoanListed || isFreeAgent);
+
+  const [activeTab, setActiveTab] = useState<'skills' | 'matches' | 'statistics' | 'transfers' | 'injuries' | 'offer' | 'contract'>(() => {
+    if (initialTab === 'offer') {
+      return isEligibleForOffer ? 'offer' : 'skills';
+    }
+    if (initialTab === 'contract') {
+      return isOwnClub ? 'contract' : 'skills';
+    }
+    if (initialTab === 'injuries') {
+      return isOwnClub ? 'injuries' : 'skills';
+    }
+    return initialTab || 'skills';
+  });
+
+  useEffect(() => {
+    if (initialTab === 'offer') {
+      if (isEligibleForOffer) {
+        setActiveTab('offer');
+      } else {
+        setActiveTab('skills');
+      }
+    } else if (initialTab) {
+      if (initialTab === 'contract' && !isOwnClub) {
+        setActiveTab('skills');
+      } else if (initialTab === 'injuries' && !isOwnClub) {
+        setActiveTab('skills');
+      } else {
+        setActiveTab(initialTab);
+      }
+    }
+  }, [initialTab, isEligibleForOffer, isOwnClub]);
+
+  useEffect(() => {
+    if (activeTab === 'offer' && !isEligibleForOffer) {
+      setActiveTab('skills');
+    }
+    if (activeTab === 'contract' && !isOwnClub) {
+      setActiveTab('skills');
+    }
+    if (activeTab === 'injuries' && !isOwnClub) {
+      setActiveTab('skills');
+    }
+  }, [isEligibleForOffer, isOwnClub, activeTab]);
+
+  // Offer State
+  const [isLoan, setIsLoan] = useState<boolean>(false);
+  const [offerAmount, setOfferAmount] = useState<number>(0);
+  const [proposedWage, setProposedWage] = useState<number>(0);
+  const [contractYears, setContractYears] = useState<number>(3);
+  const [offerSubmitting, setOfferSubmitting] = useState<boolean>(false);
+  const [offerError, setOfferError] = useState<string>('');
+  const [offerSuccess, setOfferSuccess] = useState<string>('');
+  const [existingOffer, setExistingOffer] = useState<any>(null);
+  const [loadingOffer, setLoadingOffer] = useState<boolean>(false);
+  const [cancellingOffer, setCancellingOffer] = useState<boolean>(false);
+  const [confirmCancelModal, setConfirmCancelModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const askPrice = Number(
+      detail?.status?.asking_price ??
+      player.player_status?.asking_price ??
+      (player as any).asking_price ??
+      0
+    );
+    const marketVal = Number(
+      player.market_value ||
+      (player as any).player_financial_data?.market_value ||
+      (detail as any)?.market_value ||
+      (player as any).market_value ||
+      2500000
+    );
+    // Tự động điền asking_price nếu có, nếu không thì tự động điền market_value hiện tại
+    const initialOffer = askPrice > 0 ? askPrice : marketVal;
+    setOfferAmount(initialOffer);
+    const defaultWage = Math.round(Math.max(1000, marketVal * 0.005));
+    setProposedWage(defaultWage);
+    setContractYears(3);
+    setIsLoan(false);
+    setOfferError('');
+    setOfferSuccess('');
+    setExistingOffer(null);
+
+    if (isEligibleForOffer && currentClubId && player?.id) {
+      setLoadingOffer(true);
+      transfersApi
+        .getPlayerOffer(String(currentClubId), String(player.id))
+        .then((prevOffer) => {
+          if (prevOffer) {
+            setExistingOffer(prevOffer);
+            setIsLoan(Boolean(prevOffer.is_loan));
+            if (prevOffer.offer_amount !== undefined) {
+              setOfferAmount(Number(prevOffer.offer_amount));
+            }
+            if (prevOffer.proposed_wage !== undefined) {
+              setProposedWage(Number(prevOffer.proposed_wage));
+            }
+            if (prevOffer.contract_years !== undefined) {
+              setContractYears(Number(prevOffer.contract_years));
+            }
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to load previous offer:', err);
+        })
+        .finally(() => {
+          setLoadingOffer(false);
+        });
+    }
+  }, [player, currentClubId, isEligibleForOffer]);
+
+  const handleOpenCancelConfirm = () => {
+    setOfferError('');
+    setConfirmCancelModal(true);
+  };
+
+  const executeCancelOffer = async () => {
+    if (!existingOffer || !currentClubId) return;
+    try {
+      setCancellingOffer(true);
+      setOfferError('');
+      await transfersApi.cancelOffer(existingOffer.id, String(currentClubId));
+      setOfferSuccess(t('player_modal.cancel_offer_success', 'Đã hủy lời đề nghị chuyển nhượng thành công!'));
+      setExistingOffer({ ...existingOffer, status: 'CANCELLED' });
+      setConfirmCancelModal(false);
+      if (onOfferSuccess) {
+        onOfferSuccess();
+      }
+    } catch (err: any) {
+      setOfferError(err.response?.data?.message || err.message || t('player_modal.cancel_offer_failed', 'Không thể hủy đề nghị.'));
+    } finally {
+      setCancellingOffer(false);
+    }
+  };
+
+  const handleSendOffer = async () => {
+    setOfferError('');
+    setOfferSuccess('');
+
+    if (!currentClubId) {
+      setOfferError(t('player_modal.need_club_to_offer', 'Bạn cần quản lý một CLB để gửi đề nghị chuyển nhượng!'));
+      return;
+    }
+    if (!isLoan) {
+      if (cashBalance !== undefined && offerAmount > cashBalance) {
+        setOfferError(t('player_modal.insufficient_budget', 'Ngân sách CLB không đủ! Bạn hiện có €{cash}, trong khi phí chuyển nhượng đề xuất là €{offer}. Vui lòng giảm mức giá hoặc chọn mượn cầu thủ.').replace('{cash}', cashBalance.toLocaleString()).replace('{offer}', offerAmount.toLocaleString()));
+        return;
+      }
+
+      const askPrice = Number(
+        detail?.status?.asking_price ??
+        player.player_status?.asking_price ??
+        (player as any).asking_price ??
+        0
+      );
+      const marketVal = Number(
+        player.market_value ||
+        (player as any).player_financial_data?.market_value ||
+        (detail as any)?.market_value ||
+        (player as any).market_value ||
+        2500000
+      );
+
+      // Ràng buộc nếu có asking_price: Không được đề nghị ít hơn asking_price
+      if (askPrice > 0 && offerAmount < askPrice) {
+        setOfferError(
+          t('player_offer.min_asking_price_error', 'Mức giá đề nghị không được thấp hơn mức phí tối thiểu do CLB chủ quản yêu cầu (€{minPrice}).')
+            .replace('{minPrice}', askPrice.toLocaleString())
+        );
+        return;
+      }
+
+      // Ràng buộc nếu không có asking_price: Không được đề nghị dưới 50% market_value
+      const minAllowed = Math.round(marketVal * 0.5);
+      if (askPrice <= 0 && offerAmount < minAllowed) {
+        setOfferError(
+          t('player_offer.min_market_value_error', 'Mức giá đề nghị không được thấp hơn 50% giá trị thị trường của cầu thủ (Tối thiểu €{minPrice}).')
+            .replace('{minPrice}', minAllowed.toLocaleString())
+        );
+        return;
+      }
+    }
+    const targetPlayerId = (player as any).playerId || player.id;
+    const targetClubId = (player as any).currentClub?.id || player.club_id || (player as any).club?.id;
+    if (!targetClubId) {
+      setOfferError(t('player_modal.unknown_owner_club', 'Không xác định được CLB chủ quản của cầu thủ.'));
+      return;
+    }
+
+    try {
+      setOfferSubmitting(true);
+      await transfersApi.makeOffer({
+        player_id: String(targetPlayerId),
+        to_club_id: String(targetClubId),
+        offer_amount: isLoan ? 0 : offerAmount,
+        is_loan: isLoan,
+        proposed_wage: proposedWage,
+        contract_years: contractYears,
+      });
+
+      setOfferSuccess(
+        isLoan
+          ? t('player_modal.loan_offer_sent', 'Đã gửi lời đề nghị mượn cầu thủ thành công tới CLB chủ quản!')
+          : t('player_modal.buy_offer_sent', 'Đã gửi lời đề nghị mua đứt cầu thủ thành công tới CLB chủ quản!')
+      );
+      setExistingOffer({
+        status: 'PENDING',
+        is_loan: isLoan,
+        offer_amount: isLoan ? 0 : offerAmount,
+      });
+
+      if (onOfferSuccess) {
+        onOfferSuccess();
+      }
+    } catch (err: any) {
+      setOfferError(err.response?.data?.message || err.message || t('player_modal.send_offer_failed', 'Không thể gửi đề nghị chuyển nhượng.'));
+    } finally {
+      setOfferSubmitting(false);
+    }
+  };
+
+  // Contract Renewal & Termination Modal States
+  const [showRenewModal, setShowRenewModal] = useState<boolean>(false);
+  const [renewingContract, setRenewingContract] = useState<boolean>(false);
+  const [showTerminateModal, setShowTerminateModal] = useState<boolean>(false);
+  const [terminatingContract, setTerminatingContract] = useState<boolean>(false);
+
+  const fetchPlayerDetail = async (id: string) => {
+    try {
+      setLoading(true);
+      const data: any = await playersApi.getPlayerById(id, currentClubId ? String(currentClubId) : undefined);
+      setDetail(data);
+    } catch (err) {
+      console.error('Failed to load player detail:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRenewContract = async (data: { additionalSeasons: number; proposedWage: number }) => {
+    try {
+      setRenewingContract(true);
+      const res = await transfersApi.renewPlayerContract(player.id, {
+        additional_seasons: data.additionalSeasons,
+        proposed_wage: data.proposedWage,
+        club_id: currentClubId,
+      });
+      setShowRenewModal(false);
+      await fetchPlayerDetail(player.id);
+      alert(res.message || t('contract.renew_success', 'Gia hạn hợp đồng thành công!'));
+    } catch (err: any) {
+      alert(err.response?.data?.message || err.message || t('contract.renew_failed', 'Gia hạn hợp đồng thất bại.'));
+    } finally {
+      setRenewingContract(false);
+    }
+  };
+
+  const handleTerminateContract = async () => {
+    try {
+      setTerminatingContract(true);
+      const res = await transfersApi.terminatePlayerContract(player.id, { club_id: currentClubId });
+      setShowTerminateModal(false);
+      alert(res.message || t('contract.terminate_success', 'Chấm dứt hợp đồng thành công!'));
+      onOfferSuccess?.();
+      onClose();
+    } catch (err: any) {
+      alert(err.response?.data?.message || err.message || t('contract.terminate_failed', 'Chấm dứt hợp đồng thất bại.'));
+    } finally {
+      setTerminatingContract(false);
+    }
+  };
+
+  // Load detailed player info from API
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    playersApi
+      .getPlayerById(player.id, currentClubId ? String(currentClubId) : undefined)
+      .then((data: any) => {
+        if (isMounted) {
+          setDetail(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load player detail:', err);
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [player.id, currentClubId]);
+
+  // Navigate to previous / next player in squad
+  const currentIndex = playersList.findIndex((p) => p.id === player.id);
+  const hasPrev = playersList.length > 1;
+  const hasNext = playersList.length > 1;
+
+  const handlePrev = () => {
+    if (!onSelectPlayer || playersList.length <= 1) return;
+    const prevIdx = currentIndex > 0 ? currentIndex - 1 : playersList.length - 1;
+    onSelectPlayer(playersList[prevIdx]);
+  };
+
+  const handleNext = () => {
+    if (!onSelectPlayer || playersList.length <= 1) return;
+    const nextIdx = currentIndex < playersList.length - 1 ? currentIndex + 1 : 0;
+    onSelectPlayer(playersList[nextIdx]);
+  };
+
+
+  // Basic info from DB
+  const pName = detail?.name || `${player.first_name} ${player.last_name}`.trim();
+  const pAge = detail?.age ?? player.age ?? 20;
+  const pPos = detail?.primary_position?.name || detail?.position?.name || player.position?.name || t('common.player', 'Cầu thủ');
+  const pPosCode = detail?.primary_position?.code || detail?.position?.code || player.position?.code || '-';
+  
+  // Chiều cao & Cân nặng chuẩn hóa từ DB
+  const rawHeight = detail?.height || (player as any).height;
+  const pHeight = rawHeight && rawHeight !== '-' 
+    ? `${Math.round(parseFloat(String(rawHeight).replace(/[^\d.]/g, '')))} cm` 
+    : '-';
+
+  const rawWeight = detail?.weight || (player as any).weight;
+  const pWeight = rawWeight && rawWeight !== '-' 
+    ? `${Math.round(parseFloat(String(rawWeight).replace(/[^\d.]/g, '')))} kg` 
+    : '-';
+
+  // Chân thuận
+  const rawFoot = (detail?.preferred_foot || (player as any).preferred_foot || 'RIGHT').toUpperCase();
+  const pFoot = rawFoot === 'LEFT' ? t('player_modal.foot_left', 'Left (Trái)') : rawFoot === 'BOTH' ? t('player_modal.foot_both', 'Both (Hai chân)') : t('player_modal.foot_right', 'Right (Phải)');
+
+  // Danh tiếng & Tiềm năng
+  const pReputation = detail?.reputation ?? player.reputation ?? 0;
+  const pPotential = detail?.potential ?? player.potential ?? 0;
+  const pExperience = (detail as any)?.experience_points ?? (detail as any)?.experience?.points ?? (player as any)?.experience ?? 0;
+
+  // Điểm OVR / Average Quality
+  const pQuality = (detail?.average_quality ?? player.overall_rating ?? 50.0).toFixed(2);
+  const pOvr = detail?.ovr || detail?.overall_rating || player.overall_rating || player.ovr || Math.round(Number(pQuality));
+  const pClubName = detail?.club?.name || player.club?.name || t('player_modal.free_agent', 'Tự do');
+  const pCountry = typeof detail?.nationality === 'object'
+    ? (detail?.nationality as any)?.name
+    : typeof player.nationality === 'object'
+    ? (player.nationality as any)?.name
+    : (detail?.nationality || player.nationality || '-');
+  const pShirtNo = detail?.squad_number ?? player.squad_number ?? 1;
+
+  // Giá trị thị trường và Lương tuần dùng chung hàm formatCurrency duy nhất
+  const pMarketValue = detail?.market_value ?? player.market_value;
+  const pWorth = formatCurrency(pMarketValue);
+
+  const pWeeklyWage = detail?.weekly_wage ?? (isOwnClub && player.contract?.salary ? Number(player.contract.salary) : null);
+  const pWages = isOwnClub
+    ? (pWeeklyWage && pWeeklyWage > 0 
+        ? `${formatCurrency(pWeeklyWage)} ${t('player_modal.per_week', '/ tuần')}` 
+        : (detail?.weekly_wages_display || t('player_modal.no_contract', 'Chưa ký HĐ')))
+    : (detail?.weekly_wages_display || t('player_modal.confidential', 'Bảo mật'));
+
+  // Hiển thị sao tiềm năng theo thang chuẩn 1-100 (mỗi 20 điểm = 1 sao)
+  const renderStars = (pot: number) => {
+    const starCount = pot > 5 ? Math.min(5, Math.max(1, Math.round(pot / 20))) : Math.max(1, pot);
+    const list = [];
+    for (let i = 1; i <= 5; i++) {
+      list.push(
+        <span key={i} className={i <= starCount ? 'star-gold' : 'star-muted'}>
+          ★
+        </span>
+      );
+    }
+    return list;
+  };
+
+  return (
+    <div className="player-modal-overlay" onClick={onClose}>
+      <div className="player-modal-dialog" onClick={(e) => e.stopPropagation()}>
+        {/* Top Control Bar */}
+        <div className="pm-topbar">
+          <div className="pm-topbar-left">
+            <button
+              className="pm-nav-btn"
+              onClick={handlePrev}
+              title={t('player_modal.prev_player', 'Cầu thủ trước')}
+              disabled={!hasPrev}
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              className="pm-nav-btn"
+              onClick={handleNext}
+              title={t('player_modal.next_player', 'Cầu thủ tiếp theo')}
+              disabled={!hasNext}
+            >
+              <ChevronRight size={20} />
+            </button>
+            <h2 className="pm-player-title">{pName}</h2>
+            {(detail?.is_on_loan || detail?.contract?.is_loan_contract || player.is_on_loan) && (
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  background: 'var(--game-gold-soft)',
+                  border: '1px solid var(--game-gold-line)',
+                  color: 'var(--game-gold)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                🤝 {t('player_modal.badge_loan', 'Mượn')}
+              </span>
+            )}
+            {isOwnClub && (
+              <button className="pm-icon-btn" title={t('player_modal.edit_name_tooltip', 'Chỉnh sửa tên / biệt danh')}>
+                <Edit2 size={16} />
+              </button>
+            )}
+            <button
+              className={`pm-icon-btn ${isFavorite ? 'fav-active' : ''}`}
+              onClick={() => setIsFavorite(!isFavorite)}
+              title={t('player_modal.fav_tooltip', 'Đánh dấu yêu thích')}
+            >
+              <Star size={17} fill={isFavorite ? 'var(--game-gold)' : 'none'} color={isFavorite ? 'var(--game-gold)' : 'var(--game-muted)'} />
+            </button>
+
+            {isOwnClub && (
+              <button
+                type="button"
+                className="btn btn-sm"
+                disabled={isMovingSquad}
+                style={{
+                  padding: '4px 10px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  borderRadius: '6px',
+                  cursor: isMovingSquad ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  marginLeft: '6px',
+                  opacity: isMovingSquad ? 0.7 : 1,
+                  background: 'var(--game-accent-soft)',
+                  color: 'var(--game-success)',
+                  border: '1px solid var(--game-green-line)',
+                }}
+                onClick={handleDirectMoveSquad}
+                title={
+                  (detail?.squad_type === 'YOUTH_U21' || player.squad_type === 'YOUTH_U21')
+                    ? t('squad.tooltip_promote', 'Đưa cầu thủ lên Đội Một')
+                    : t('squad.tooltip_demote', 'Chuyển cầu thủ xuống Đội Trẻ U21')
+                }
+              >
+                <span>
+                  {(detail?.squad_type === 'YOUTH_U21' || player.squad_type === 'YOUTH_U21')
+                    ? t('squad.btn_promote', 'Lên Đội 1')
+                    : t('squad.btn_demote', 'Xuống Đội Trẻ')}
+                </span>
+              </button>
+            )}
+          </div>
+
+          <button className="pm-close-btn" onClick={onClose} title={t('player_modal.close_tooltip', 'Đóng')}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Two Column Layout (Left: 30-40% Basic Info & Avatar, Right: Tabs) */}
+        <div className="pm-two-col-layout">
+          {/* LEFT COLUMN: 30-40% BASIC INFO & AVATAR */}
+          <div className="pm-left-col">
+            {/* Avatar & Jersey & Identity */}
+            <div className="pm-left-card">
+              <div className="pm-avatar-container" style={{ width: 104, height: 104, margin: '0 auto' }}>
+                <div className="pm-avatar-box">
+                  {detail?.photo_url || player.photo_url ? (
+                    <img
+                      src={getFacepackUrl(detail?.photo_url || player.photo_url)}
+                      alt=""
+                      className="pm-avatar-img"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="pm-avatar-placeholder">
+                      <span className="pm-placeholder-icon">👤</span>
+                    </div>
+                  )}
+                </div>
+                <div className="pm-jersey-badge" title={t('player_modal.shirt_no_tooltip', 'Số áo: {no}').replace('{no}', String(pShirtNo))}>
+                  <span className="pm-jersey-num">#{pShirtNo}</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '4px' }}>
+                <h3 style={{ margin: '0 0 4px 0', fontSize: '1.12rem', fontWeight: 800, color: 'var(--game-ink)' }}>
+                  {pName}
+                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                  <span className="position-tag" style={{ fontSize: '0.75rem', padding: '2px 8px', fontWeight: 700 }}>
+                    {pPosCode} • {t(`positions.${pPosCode}`, pPos)}
+                  </span>
+                  {(detail?.is_on_loan || detail?.contract?.is_loan_contract || player.is_on_loan) && (
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        padding: '2px 7px',
+                        borderRadius: '4px',
+                        background: 'var(--game-gold-soft)',
+                        border: '1px solid var(--game-gold-line)',
+                        color: 'var(--game-gold)',
+                      }}
+                    >
+                      🤝 {t('player_modal.badge_loan', 'Mượn')}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {isOwnClub && (
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  disabled={isMovingSquad}
+                  style={{
+                    width: '100%',
+                    marginTop: '4px',
+                    padding: '6px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    cursor: isMovingSquad ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '5px',
+                    opacity: isMovingSquad ? 0.7 : 1,
+                    background: 'var(--game-accent-soft)',
+                    color: 'var(--game-success)',
+                    border: '1px solid var(--game-green-line)',
+                  }}
+                  onClick={handleDirectMoveSquad}
+                  title={
+                    (detail?.squad_type === 'YOUTH_U21' || player.squad_type === 'YOUTH_U21')
+                      ? t('squad.tooltip_promote', 'Đưa cầu thủ lên Đội Một')
+                      : t('squad.tooltip_demote', 'Chuyển cầu thủ xuống Đội Trẻ U21')
+                  }
+                >
+                  <span>
+                    {(detail?.squad_type === 'YOUTH_U21' || player.squad_type === 'YOUTH_U21')
+                      ? t('squad.btn_promote', 'Lên Đội 1')
+                      : t('squad.btn_demote', 'Xuống Đội Trẻ')}
+                  </span>
+                </button>
+              )}
+            </div>
+
+            {/* OVR & Potential Ratings Card */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: 'var(--game-surface)', padding: '10px 12px', borderRadius: '10px', border: '1px solid var(--game-line)', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)' }}>
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--game-muted)', fontWeight: 700, textTransform: 'uppercase' }}>OVR</span>
+                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--game-gold)', fontFamily: 'var(--font-game)' }}>{pOvr}</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--game-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{t('player_modal.col_potential', 'Tiềm năng')}</span>
+                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--game-accent)', fontFamily: 'var(--font-game)' }}>{pPotential}</div>
+                <div className="pm-stars-wrap" style={{ fontSize: '0.75rem', marginTop: '-2px' }}>{renderStars(pPotential)}</div>
+              </div>
+            </div>
+
+            {/* Section 1: Physical Info */}
+            <div className="pm-left-section">
+              <span className="pm-left-section-title">
+                {t('player_modal.section_physical', 'Thông Tin Thể Chất')}
+              </span>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_country', 'Quốc tịch:')}</span>
+                <span className="pm-value">
+                  {pCountry} {(detail?.nationality_detail?.flag_url || player.nationalityFlag) ? (
+                    <img src={detail?.nationality_detail?.flag_url || player.nationalityFlag} alt="" className="pm-flag-img" />
+                  ) : null}
+                </span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_age', 'Tuổi:')}</span>
+                <span className="pm-value pm-val-bold">{pAge}</span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_height', 'Chiều cao:')}</span>
+                <span className="pm-value">{pHeight}</span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_weight', 'Cân nặng:')}</span>
+                <span className="pm-value">{pWeight}</span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_foot', 'Chân thuận:')}</span>
+                <span className="pm-value">{pFoot}</span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_quality', 'Chất lượng TB:')}</span>
+                <span className="pm-value pm-val-bold pm-quality-val">{pQuality}</span>
+              </div>
+            </div>
+
+            {/* Section 2: Club & Finances */}
+            <div className="pm-left-section">
+              <span className="pm-left-section-title">
+                {t('player_modal.section_club', 'CLB & Thị Trường')}
+              </span>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_team', 'Đội bóng:')}</span>
+                <span className="pm-value pm-val-bold pm-team-link">
+                  {pClubName} {(detail?.club as any)?.country_flag ? (
+                    <img src={(detail?.club as any).country_flag} alt="" className="pm-flag-img" />
+                  ) : null}
+                </span>
+              </div>
+              {(detail?.is_on_loan || detail?.contract?.is_loan_contract || player.is_on_loan) && (
+                <div className="pm-info-row">
+                  <span className="pm-label">{t('player_modal.parent_club_label', 'CLB Gốc:')}</span>
+                  <span className="pm-value pm-val-bold" style={{ color: 'var(--game-info)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {detail?.contract?.parent_club_name || detail?.on_loan?.parent_club_name || player.parent_club?.name || t('player_modal.owning_club', 'CLB Chủ Quản')}
+                  </span>
+                </div>
+              )}
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_worth', 'Định giá:')}</span>
+                <span className="pm-value pm-worth-val">
+                  <Coins size={14} className="pm-coin-icon" /> {pWorth}
+                </span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_wage', 'Lương tuần:')}</span>
+                <span className="pm-value pm-val-bold" style={{ color: 'var(--game-success)' }}>
+                  {pWages}
+                </span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.col_reputation', 'Danh tiếng:')}</span>
+                <span className="pm-value pm-reputation-val">
+                  <Award size={14} className="pm-icon-badge" />
+                  {formatNumber(pReputation)}
+                </span>
+              </div>
+              <div className="pm-info-row">
+                <span className="pm-label">{t('player_modal.experience', 'Kinh nghiệm:')}</span>
+                <span className="pm-value pm-val-bold" style={{ color: 'var(--game-gold)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Zap size={14} fill="var(--game-gold)" color="var(--game-gold)" />
+                  {formatNumber(pExperience)} EXP
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: TABS & CONTENT */}
+          <div className="pm-right-col">
+            {/* 5 Tabs Navigation Header */}
+            <div className="pm-tabs-bar">
+              <button
+                className={`pm-tab-btn ${activeTab === 'skills' ? 'active' : ''}`}
+                onClick={() => setActiveTab('skills')}
+              >
+                <Star size={15} />
+                <span>{t('player.tab_skills')}</span>
+              </button>
+              <button
+                className={`pm-tab-btn ${activeTab === 'matches' ? 'active' : ''}`}
+                onClick={() => setActiveTab('matches')}
+              >
+                <Activity size={15} />
+                <span>{t('player.tab_matches')}</span>
+              </button>
+              <button
+                className={`pm-tab-btn ${activeTab === 'statistics' ? 'active' : ''}`}
+                onClick={() => setActiveTab('statistics')}
+              >
+                <Award size={15} />
+                <span>{t('player_modal.career_history_tab', 'Lịch Sử Các Mùa')}</span>
+              </button>
+              <button
+                className={`pm-tab-btn ${activeTab === 'transfers' ? 'active' : ''}`}
+                onClick={() => setActiveTab('transfers')}
+              >
+                <Coins size={15} />
+                <span>{t('player.tab_transfers')}</span>
+              </button>
+              {isOwnClub && (
+                <button
+                  className={`pm-tab-btn ${activeTab === 'injuries' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('injuries')}
+                >
+                  <HeartPulse size={15} />
+                  <span>{t('player.tab_injuries')}</span>
+                </button>
+              )}
+              {isOwnClub && (
+                <button
+                  className={`pm-tab-btn ${activeTab === 'contract' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('contract')}
+                >
+                  <FileText size={15} />
+                  <span>{t('player.tab_contract', 'Hợp đồng')}</span>
+                </button>
+              )}
+              {isEligibleForOffer && (
+                <button
+                  className={`pm-tab-btn ${activeTab === 'offer' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('offer')}
+                  style={activeTab === 'offer' ? { color: 'var(--game-accent)', borderBottomColor: 'var(--game-success)', fontWeight: 700 } : {}}
+                >
+                  <Coins size={15} />
+                  <span>{t('player.tab_offer')}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Tab Content Body */}
+            <div className="pm-tab-content">
+              {loading ? (
+                <div className="pm-loading-state">
+                  <div className="pm-spinner" />
+                  <span>{t('player_modal.loading_profile', 'Đang tải hồ sơ cầu thủ...')}</span>
+                </div>
+              ) : (
+                <>
+                  {/* TAB 1: SKILLS */}
+                  {activeTab === 'skills' && (
+                    <PlayerSkillsTab
+                      detail={detail}
+                      pPosCode={pPosCode}
+                    />
+                  )}
+
+                  {/* TAB 2: MATCHES THIS SEASON */}
+                  {activeTab === 'matches' && (
+                    <PlayerMatchesTab detail={detail} />
+                  )}
+
+                  {/* TAB 3: STATISTICS ACROSS SEASONS */}
+                  {activeTab === 'statistics' && (
+                    <PlayerStatsTab detail={detail} />
+                  )}
+
+                  {/* TAB 4: TRANSFERS */}
+                  {activeTab === 'transfers' && (
+                    <PlayerTransfersTab detail={detail} />
+                  )}
+
+                  {/* TAB 5: INJURIES (CHỈ HIỂN THỊ KHI LÀ CLB CHỦ QUẢN) */}
+                  {isOwnClub && activeTab === 'injuries' && (
+                    <PlayerInjuriesTab detail={detail} />
+                  )}
+
+                  {/* TAB 6: OFFER */}
+                  {isEligibleForOffer && activeTab === 'offer' && (
+                    <PlayerOfferTab
+                      player={player}
+                      detail={detail}
+                      currentClubId={currentClubId}
+                      cashBalance={cashBalance}
+                      offerSuccess={offerSuccess}
+                      offerError={offerError}
+                      loadingOffer={loadingOffer}
+                      existingOffer={existingOffer}
+                      isLoan={isLoan}
+                      setIsLoan={setIsLoan}
+                      offerAmount={offerAmount}
+                      setOfferAmount={setOfferAmount}
+                      proposedWage={proposedWage}
+                      setProposedWage={setProposedWage}
+                      contractYears={contractYears}
+                      setContractYears={setContractYears}
+                      offerSubmitting={offerSubmitting}
+                      handleSendOffer={handleSendOffer}
+                      handleOpenCancelConfirm={() => setConfirmCancelModal(true)}
+                      cancellingOffer={cancellingOffer}
+                    />
+                  )}
+                  {/* TAB 7: CONTRACT (CHỈ HIỂN THỊ VỚI CẦU THỦ THUỘC CLB CHỦ QUẢN) */}
+                  {activeTab === 'contract' && isOwnClub && (
+                    <PlayerContractTab
+                      player={player}
+                      detail={detail}
+                      isOwnClub={isOwnClub}
+                      onOpenRenewModal={() => setShowRenewModal(true)}
+                      onOpenTerminateModal={() => setShowTerminateModal(true)}
+                      onPlayerUpdated={onPlayerUpdated}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+        {/* Modal Footer */}
+        <div className="pm-footer">
+          <span className="pm-player-id">#{player.id}</span>
+          <button className="pm-footer-close-btn" onClick={onClose}>
+            {t('common.close', 'Đóng')}
+          </button>
+        </div>
+        {/* MODAL XÁC NHẬN HỦY LỜI ĐỀ NGHỊ */}
+        <ConfirmModal
+          isOpen={confirmCancelModal}
+          title={t('player_modal.confirm_cancel_title', 'Xác Nhận Hủy Lời Đề Nghị')}
+          variant="danger"
+          confirmText={t('player_modal.confirm_cancel_btn', 'Đồng Ý Hủy')}
+          cancelText={t('player_modal.cancel_back_btn', 'Quay Lại')}
+          isLoading={cancellingOffer}
+          onConfirm={executeCancelOffer}
+          onClose={() => !cancellingOffer && setConfirmCancelModal(false)}
+          message={
+            <div>
+              <p style={{ margin: '0 0 1rem 0', color: 'var(--game-text)' }}>
+                {t('player_modal.confirm_cancel_msg', 'Bạn có chắc chắn muốn rút lại lời đề nghị chuyển nhượng đang chờ phản hồi cho cầu thủ này không?')}
+              </p>
+              <div
+                style={{
+                  background: 'var(--game-danger-soft)',
+                  border: '1px solid var(--game-danger-line)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1rem',
+                  fontSize: '0.86rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.4rem',
+                }}
+              >
+                <div>{t('player_modal.player_label', 'Cầu thủ:')} <strong style={{ color: 'var(--game-ink)' }}>{player.name || player.common_name || (player.first_name ? player.first_name + ' ' + (player.last_name || '') : 'Cầu thủ')}</strong></div>
+                <div>{t('player_modal.type_label', 'Hình thức:')} <strong>{existingOffer && existingOffer.is_loan ? t('player_modal.type_loan', 'Cho Mượn') : t('player_modal.type_buy', 'Mua Đứt')}</strong></div>
+                <div>{t('player_modal.refund_fee_label', 'Mức phí hoàn trả:')} <strong style={{ color: 'var(--game-danger)' }}>{existingOffer && existingOffer.is_loan ? '€0 (Mượn)' : '€' + Number(existingOffer ? existingOffer.offer_amount : 0).toLocaleString()}</strong></div>
+              </div>
+            </div>
+          }
+        />
+
+        {/* MODAL GIA HẠN HỢP ĐỒNG */}
+        <RenewContractModal
+          isOpen={showRenewModal}
+          onClose={() => setShowRenewModal(false)}
+          title={t('contract.renew_player_title', 'Gia Hạn Hợp Đồng Cầu Thủ')}
+          name={`${player.first_name || ''} ${player.last_name || ''}`.trim() || player.name || 'Cầu thủ'}
+          currentWage={detail?.contract?.weekly_wage || detail?.contract?.salary || (player.contract?.salary ? Number(player.contract.salary) : 5000)}
+          currentEndSeason={detail?.contract?.end_season_id || detail?.contract?.current_season || 1}
+          isLoading={renewingContract}
+          onConfirm={handleRenewContract}
+        />
+
+        {/* MODAL XÁC NHẬN SA THẢI / CHẤM DỨT HỢP ĐỒNG / TRẢ MƯỢN */}
+        <ConfirmModal
+          isOpen={showTerminateModal}
+          title={
+            (detail?.contract?.is_loan_contract || detail?.is_on_loan || player.is_on_loan)
+              ? t('contract.confirm_terminate_loan_title', 'Xác Nhận Chấm Dứt Mượn Cầu Thủ')
+              : t('contract.confirm_terminate_title', 'Xác Nhận Sa Thải / Thanh Lý Hợp Đồng')
+          }
+          variant="danger"
+          confirmText={
+            (detail?.contract?.is_loan_contract || detail?.is_on_loan || player.is_on_loan)
+              ? t('contract.confirm_terminate_loan_btn', 'Chấm Dứt Mượn & Hoàn Trả')
+              : t('contract.confirm_terminate_btn', 'Xác Nhận Sa Thải')
+          }
+          cancelText={t('common.cancel', 'Hủy Bỏ')}
+          isLoading={terminatingContract}
+          onConfirm={handleTerminateContract}
+          onClose={() => !terminatingContract && setShowTerminateModal(false)}
+          message={
+            <div>
+              <p style={{ margin: '0 0 1rem 0', color: 'var(--game-text)' }}>
+                {(detail?.contract?.is_loan_contract || detail?.is_on_loan || player.is_on_loan)
+                  ? t('contract.confirm_terminate_loan_msg', 'Bạn có chắc chắn muốn chấm dứt hợp đồng mượn với cầu thủ này? Cầu thủ sẽ rời khỏi đội bóng ngay lập tức và được hoàn trả về CLB chủ quản gốc.')
+                  : t('contract.confirm_terminate_player_msg', 'Bạn có chắc chắn muốn kết thúc hợp đồng với cầu thủ này? Cầu thủ sẽ rời khỏi đội bóng ngay lập tức và trở thành cầu thủ tự do.')}
+              </p>
+              <div
+                style={{
+                  background: 'var(--game-danger-soft)',
+                  border: '1px solid var(--game-danger-line)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1rem',
+                  fontSize: '0.86rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.4rem',
+                }}
+              >
+                <div>{t('player_modal.player_label', 'Cầu thủ:')} <strong style={{ color: 'var(--game-ink)' }}>{player.name || player.common_name || (player.first_name ? player.first_name + ' ' + (player.last_name || '') : 'Cầu thủ')}</strong></div>
+                {(detail?.contract?.is_loan_contract || detail?.is_on_loan || player.is_on_loan) && (
+                  <div>{t('contract.parent_club_label', 'CLB Chủ Quản (Gốc):')} <strong style={{ color: 'var(--game-info)' }}>{detail?.contract?.parent_club_name || detail?.on_loan?.parent_club_name || player.parent_club?.name || t('player_modal.owning_club', 'CLB Chủ Quản')}</strong></div>
+                )}
+                <div>{t('contract.weekly_wage_label', 'Mức Lương Tuần:')} <strong>{formatCurrency(detail?.contract?.weekly_wage || detail?.contract?.salary || 0)} / {t('common.week', 'tuần')}</strong></div>
+              </div>
+            </div>
+          }
+        />
+      </div>
+    </div>
+  );
+};

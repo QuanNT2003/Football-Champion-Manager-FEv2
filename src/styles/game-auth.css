@@ -1,0 +1,78 @@
+.game-auth { @apply grid min-h-dvh lg:grid-cols-[minmax(0,1.35fr)_minmax(380px,1fr)]; }
+.game-auth-art {
+  @apply isolate flex min-h-[216px] flex-col justify-between gap-8 p-5 sm:p-8 lg:sticky lg:top-0 lg:h-dvh lg:p-12;
+  background: linear-gradient(0deg, #07120ff5 2%, #07120f0f 85%), var(--game-stadium-art) 43% 52% / cover;
+}
+.game-auth-title { @apply relative pb-1 lg:pb-10; }
+.game-auth-title::before {
+  content: '';
+  @apply mb-3 block h-[3px] w-12 lg:mb-5;
+  background: var(--game-accent);
+}
+.game-auth-title h1 {
+  @apply font-game leading-[0.81] font-black tracking-tight;
+  font-size: clamp(2.35rem, 7.2vw, 9rem);
+  color: white;
+  text-shadow: 0 2px 20px #0009;
+}
+.game-auth-title em { color: var(--game-accent); }
+.game-auth-title p { @apply mt-3 text-xs font-medium sm:text-sm lg:mt-6; color: #c6d7cb; }
+.game-auth-side {
+  @apply relative grid min-w-0 content-center justify-items-center p-5 pt-16 sm:p-8 sm:pt-17 lg:p-12;
+  background: radial-gradient(ellipse at 82% 16%, #233925 0%, transparent 60%), var(--game-bg);
+  border-left: 1px solid var(--game-line);
+}
+.game-auth-language {
+  @apply absolute top-4 right-5 inline-flex items-center gap-2 text-xs lg:top-8 lg:right-8;
+  color: var(--game-muted);
+}
+.game-auth-language select { @apply cursor-pointer rounded-sm px-2 py-1; background: var(--game-surface); color: var(--game-ink); }
+.game-auth-form { @apply grid w-full max-w-[420px] gap-4 sm:gap-5; }
+.game-auth-form h2 { @apply font-game text-[clamp(2.6rem,5vw,4rem)] leading-[0.91] font-extrabold tracking-tight uppercase; }
+.game-auth-tabs { @apply grid grid-cols-2 rounded-sm; border: 1px solid var(--game-line); }
+.game-auth-tabs button {
+  @apply cursor-pointer px-2 py-2.5 text-xs font-bold;
+  color: var(--game-muted);
+}
+.game-auth-tabs button[aria-pressed='false']:hover { color: var(--game-ink); }
+.game-auth-tabs button[aria-pressed='true'] {
+  background: var(--game-raised);
+  color: var(--game-accent);
+  box-shadow: inset 0 -2px var(--game-accent);
+}
+.game-auth-field { @apply grid gap-1.5; }
+.game-auth-field > span:first-child { @apply text-[10px] font-bold tracking-wider uppercase; color: var(--game-muted); }
+.game-auth-field > span + span {
+  @apply flex min-h-[44px] items-center gap-2 rounded-sm px-3;
+  background: var(--game-surface);
+  border: 1px solid var(--game-line);
+}
+.game-auth-field > span + span:focus-within { border-color: var(--game-accent); }
+.game-auth-field svg { @apply shrink-0; color: var(--game-muted); }
+.game-auth-field input { @apply min-w-0 flex-1 py-2 text-sm; color: var(--game-ink); }
+.game-auth-field input:focus { outline: none; }
+.game-auth-submit { @apply mt-1 min-h-12 w-full justify-between px-4 text-sm; }
+.game-auth-error {
+  @apply flex items-center gap-2 rounded-sm px-3 py-2 text-xs;
+  color: #fecdd3;
+  background: #5a2830;
+}
+.game-auth-error svg { @apply shrink-0; }
+.game-auth-demo {
+  @apply flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-sm px-2 text-xs font-semibold;
+  color: var(--game-muted);
+}
+.game-auth-demo:hover { color: var(--game-accent); }
+
+.app-loading-screen-hud {
+  background: linear-gradient(90deg, #0a1512e6, #0a1512bd), var(--game-stadium-art) center / cover;
+  color: var(--game-ink);
+}
+.app-loading-screen-hud .loading-card-hud {
+  background: var(--game-surface);
+  border: 1px solid var(--game-line);
+  color: var(--game-ink);
+}
+.app-loading-screen-hud .loading-card-hud h2 { color: var(--game-ink); }
+.app-loading-screen-hud .loading-spinner-row { color: var(--game-muted); }
+

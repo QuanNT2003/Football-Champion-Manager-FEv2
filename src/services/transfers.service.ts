@@ -1,0 +1,401 @@
+import { request } from './client';
+import { TransferOffer } from '../types';
+
+export interface StaffMarketItem {
+  id: string;
+  name: string;
+  staffType: string;
+  role?: string;
+  coachingLicense: string;
+  tacticalStyle: string;
+  reputation: number;
+  ovr?: number;
+  overall_rating?: number;
+  age?: number;
+  birth_season_day?: number;
+  nationality: string;
+  countryCode: string;
+  countryFlag?: string;
+  preferredFormation?: {
+    id: string;
+    name: string;
+    code: string;
+  };
+  currentClub?: {
+    id: string;
+    name: string;
+    logo_url?: string;
+  } | null;
+  wage: number;
+  signingFee: number;
+  photoUrl?: string;
+  attributes?: Record<string, any> | null;
+  staff_attributes?: Record<string, any> | null;
+}
+
+export interface MarketFilterParams {
+  page?: number;
+  limit?: number;
+  status?: 'ALL' | 'FREE' | 'LOAN' | 'TRANSFER';
+  isLoan?: boolean;
+  position?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minAge?: number;
+  maxAge?: number;
+  nationalityId?: string;
+  minOvr?: number;
+  maxOvr?: number;
+  attributes?: Record<string, number>;
+}
+
+export interface FilterOptionsResponse {
+  countries: { id: string; code: string; name: string; flag_url?: string | null }[];
+  attributes: { id: string; code: string; name: string; category: string }[];
+  staffAttributes?: { id: string; code: string; name: string; category: string; description?: string }[];
+  formations?: { id: string; code: string; name: string }[];
+}
+
+export interface StaffMarketFilterParams {
+  page?: number;
+  limit?: number;
+  role?: string;
+  search?: string;
+  license?: string;
+  tacticalStyle?: string;
+  formationId?: string;
+  nationalityId?: string;
+  minAge?: number;
+  maxAge?: number;
+  minOvr?: number;
+  maxOvr?: number;
+  attributes?: Record<string, number>;
+}
+
+
+export interface StaffAttributeItem {
+  id: string;
+  code: string;
+  name: string;
+  category: 'COACHING' | 'MENTAL' | 'SCOUTING' | 'MEDICAL';
+  description: string;
+  value: number;
+  is_key: boolean;
+  multiplier: number;
+}
+
+export interface StaffDetailResponse {
+  id: string;
+  name: string;
+  staffType: string;
+  coachingLicense: string;
+  tacticalStyle: string;
+  reputation: number;
+  ovr?: number;
+  overall_rating?: number;
+  age?: number;
+  birth_season_day?: number;
+  photoUrl?: string;
+  nationality?: {
+    id: string;
+    name: string;
+    code: string;
+    flag_url?: string;
+  } | null;
+  preferredFormation?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+  secondaryFormation?: {
+    id: string;
+    name: string;
+    code: string;
+  } | null;
+  estimatedWage: number;
+  attributes: StaffAttributeItem[];
+  groupedAttributes: {
+    coaching: StaffAttributeItem[];
+    mental: StaffAttributeItem[];
+    scouting: StaffAttributeItem[];
+    medical: StaffAttributeItem[];
+  };
+  currentContract?: {
+    id: string;
+    club?: { id: string; name: string; logo_url?: string } | null;
+    role?: string;
+    squad_type?: string;
+    salary: number;
+    weekly_wage?: number;
+    startDate: string;
+    endDate?: string | null;
+    start_season_id?: number;
+    start_season_day?: number;
+    end_season_id?: number;
+    end_season_day?: number;
+    status: string;
+    current_season?: number;
+    remaining_seasons?: number;
+  } | null;
+  contractHistory: Array<{
+    id: string;
+    club?: { id: string; name: string; logo_url?: string } | null;
+    salary: number;
+    startDate: string;
+    endDate?: string | null;
+    status: string;
+  }>;
+  existingOffer?: {
+    id: string;
+    role_offered: string;
+    proposed_wage: number;
+    contract_years: number;
+    signing_bonus: number;
+    status: string;
+    createdAt: string;
+  } | null;
+}
+
+export interface StaffOfferItem {
+  id: string;
+  staff_id: string;
+  staff_name: string;
+  staff_type: string;
+  coaching_license: string;
+  role_offered: string;
+  proposed_wage: number;
+  contract_years: number;
+  signing_bonus: number;
+  status: string;
+  created_at: string;
+  country?: { name: string; code: string; flag_url?: string };
+  photo_url?: string;
+}
+
+export interface TransferStaffSummary {
+  id: string;
+  name: string;
+  staff_type: string;
+  coaching_license: string;
+  age: number;
+  ovr: number;
+  photo_url: string | null;
+}
+
+export interface ClubStaffTransferOffer {
+  id: string;
+  staff: TransferStaffSummary;
+  club: { id: string; name: string } | null;
+  role: string;
+  wage: number;
+  years: number;
+  bonus: number;
+  compensation: number;
+  season_number?: number | null;
+  season_day?: number | null;
+}
+
+export interface ClubStaffTransferHistory {
+  id: string;
+  staff: TransferStaffSummary;
+  role: string;
+  wage: number;
+  season_number?: number | null;
+  season_day?: number | null;
+  status: string;
+}
+
+interface StaffTransferDirection {
+  offers: ClubStaffTransferOffer[];
+  history: ClubStaffTransferHistory[];
+}
+
+export const transfersApi = {
+  getMarket: (params?: MarketFilterParams) => {
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 20;
+    const query = new URLSearchParams();
+    query.append('page', String(page));
+    query.append('limit', String(limit));
+
+    if (params?.status && params.status !== 'ALL') {
+      query.append('status', params.status);
+    }
+    if (params?.isLoan !== undefined) {
+      query.append('isLoan', String(params.isLoan));
+    }
+    if (params?.position && params.position !== 'ALL') {
+      query.append('position', params.position);
+    }
+    if (params?.search) {
+      query.append('search', params.search);
+    }
+    if (params?.minPrice !== undefined) {
+      query.append('minPrice', String(params.minPrice));
+    }
+    if (params?.maxPrice !== undefined) {
+      query.append('maxPrice', String(params.maxPrice));
+    }
+    if (params?.minAge !== undefined) {
+      query.append('minAge', String(params.minAge));
+    }
+    if (params?.maxAge !== undefined) {
+      query.append('maxAge', String(params.maxAge));
+    }
+    if (params?.nationalityId) {
+      query.append('nationalityId', params.nationalityId);
+    }
+    if (params?.minOvr !== undefined) {
+      query.append('minOvr', String(params.minOvr));
+    }
+    if (params?.maxOvr !== undefined) {
+      query.append('maxOvr', String(params.maxOvr));
+    }
+    if (params?.attributes && Object.keys(params.attributes).length > 0) {
+      query.append('attributes', JSON.stringify(params.attributes));
+    }
+
+    return request(`/transfers/market?${query.toString()}`);
+  },
+
+  getFilterOptions: () =>
+    request<FilterOptionsResponse>('/transfers/filter-options'),
+
+  makeOffer: (data: {
+    player_id: string;
+    to_club_id?: string;
+    offer_amount: number;
+    is_loan?: boolean;
+    proposed_wage?: number;
+    contract_years?: number;
+  }) =>
+    request('/transfers/offers', {
+      method: 'POST',
+      body: JSON.stringify({
+        player_id: data.player_id,
+        to_club_id: data.to_club_id,
+        offer_amount: data.offer_amount,
+        is_loan: data.is_loan,
+        proposed_wage: data.proposed_wage,
+        contract_years: data.contract_years,
+      }),
+    }),
+
+  getPlayerOffer: (clubId: string, playerId: string) =>
+    request<TransferOffer | null>(
+      `/transfers/offers/club/${clubId}/player/${playerId}`
+    ),
+
+  getClubOffers: (clubId: string) =>
+    request<{ incoming: TransferOffer[]; outgoing: TransferOffer[] }>(
+      `/transfers/offers/club/${clubId}`
+    ),
+
+  cancelOffer: (offerId: string, clubId?: string) =>
+    request(`/transfers/offers/${offerId}/cancel`, {
+      method: 'PUT',
+      body: JSON.stringify({ clubId }),
+    }),
+
+  respondOffer: (
+    offerId: string,
+    data: { response: 'ACCEPTED' | 'REJECTED'; clubId?: string }
+  ) =>
+    request(`/transfers/offers/${offerId}/respond`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  getClubStaff: (clubId: string) =>
+    request<StaffMarketItem[]>(`/transfers/club/${clubId}/staff`),
+
+  getStaffMarket: (params?: StaffMarketFilterParams) => {
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 20;
+    const query = new URLSearchParams();
+    query.append('page', String(page));
+    query.append('limit', String(limit));
+
+    if (params?.role && params.role !== 'ALL') query.append('role', params.role);
+    if (params?.search) query.append('search', params.search);
+    if (params?.license && params.license !== 'ALL') query.append('license', params.license);
+    if (params?.tacticalStyle && params.tacticalStyle !== 'ALL') query.append('tacticalStyle', params.tacticalStyle);
+    if (params?.formationId) query.append('formationId', params.formationId);
+    if (params?.nationalityId) query.append('nationalityId', params.nationalityId);
+    if (params?.minAge !== undefined) query.append('minAge', String(params.minAge));
+    if (params?.maxAge !== undefined) query.append('maxAge', String(params.maxAge));
+    if (params?.minOvr !== undefined) query.append('minOvr', String(params.minOvr));
+    if (params?.maxOvr !== undefined) query.append('maxOvr', String(params.maxOvr));
+    if (params?.attributes && Object.keys(params.attributes).length > 0) {
+      query.append('attributes', JSON.stringify(params.attributes));
+    }
+
+    return request<{ total: number; page: number; limit: number; totalPages: number; items: StaffMarketItem[] }>(
+      `/transfers/staff-market?${query.toString()}`
+    );
+  },
+
+  hireStaff: (data: { clubId: string; staffId: string }) =>
+    request('/transfers/hire-staff', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getStaffDetail: (staffId: string, clubId?: string) => {
+    let url = `/transfers/staff/${staffId}`;
+    if (clubId) url += `?clubId=${encodeURIComponent(clubId)}`;
+    return request<StaffDetailResponse>(url);
+  },
+
+  makeStaffOffer: (data: {
+    staff_id: string;
+    club_id: string;
+    role_offered?: string;
+    proposed_wage: number;
+    contract_years: number;
+    signing_bonus?: number;
+  }) =>
+    request<{ message: string; offer: any }>('/transfers/staff-offers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getStaffOffers: (clubId: string) =>
+    request<StaffOfferItem[]>(`/transfers/staff-offers/club/${clubId}`),
+
+  getClubStaffTransfers: (clubId: string) =>
+    request<{ arrivals: StaffTransferDirection; departures: StaffTransferDirection }>(
+      `/transfers/club/${clubId}/staff-transfers`,
+    ),
+
+  cancelStaffOffer: (offerId: string, clubId?: string) =>
+    request(`/transfers/staff-offers/${offerId}/cancel`, {
+      method: 'PUT',
+      body: JSON.stringify({ clubId }),
+    }),
+
+  renewPlayerContract: (playerId: string, data: { additional_seasons: number; proposed_wage: number; club_id?: string }) =>
+    request<{ success: boolean; message: string; contract: any }>(`/transfers/players/${playerId}/renew-contract`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  terminatePlayerContract: (playerId: string, data?: { club_id?: string }) =>
+    request<{ success: boolean; message: string }>(`/transfers/players/${playerId}/terminate-contract`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
+    }),
+
+  renewStaffContract: (staffId: string, data: { additional_seasons: number; proposed_wage: number; club_id?: string }) =>
+    request<{ success: boolean; message: string; contract: any }>(`/transfers/staff/${staffId}/renew-contract`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  terminateStaffContract: (staffId: string, data?: { club_id?: string }) =>
+    request<{ success: boolean; message: string }>(`/transfers/staff/${staffId}/terminate-contract`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
+    }),
+};

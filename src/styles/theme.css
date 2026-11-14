@@ -1,0 +1,102 @@
+@theme inline {
+  --color-primary: var(--game-accent);
+  --color-primary-hover: var(--game-accent-hover);
+  --color-primary-light: var(--game-accent-soft);
+  --color-accent-gold: var(--game-gold);
+  --color-neon-green: var(--game-success);
+  --color-pos-gk: var(--game-gold);
+  --color-pos-def: var(--game-info);
+  --color-pos-mid: var(--game-success);
+  --color-pos-fwd: var(--game-danger);
+  --color-game-surface: var(--game-surface);
+  --color-game-ink: var(--game-ink);
+  --color-game-muted: var(--game-muted);
+  --color-game-accent: var(--game-accent);
+  --color-game-accent-soft: var(--game-accent-soft);
+  --font-game: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+:root {
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-game: var(--font-display);
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --game-bg: #0c110f;
+  --game-rail: #111815;
+  --game-surface: #141d18;
+  --game-raised: #1b2720;
+  --game-hover: #26382b;
+  --game-input: #101813;
+  --game-line: #2a392f;
+  --game-line-strong: #465a4b;
+  --game-line-active: #6d8972;
+  --game-ink: #eff7f1;
+  --game-text: #d1dfd5;
+  --game-muted: #a1b2a7;
+  --game-dim: #899f90;
+  --game-accent: #beff55;
+  --game-accent-hover: #d2ff88;
+  --game-accent-soft: #253924;
+  --game-green-line: #426844;
+  --game-green-strong: #285b35;
+  --game-green-deep: #1d442b;
+  --game-success: #90dfae;
+  --game-teal: #83e1cf;
+  --game-teal-soft: #183630;
+  --game-teal-line: #2d6257;
+  --game-teal-strong: #205b51;
+  --game-info: #9bd9ff;
+  --game-info-soft: #1c3141;
+  --game-info-line: #3b5d72;
+  --game-info-strong: #245675;
+  --game-gold: #f1c875;
+  --game-gold-soft: #342a19;
+  --game-gold-line: #69502b;
+  --game-gold-strong: #694a20;
+  --game-orange: #ffc18c;
+  --game-orange-soft: #3a281d;
+  --game-orange-line: #734c35;
+  --game-orange-strong: #713f27;
+  --game-danger: #ff9ea9;
+  --game-danger-soft: #392229;
+  --game-danger-line: #733c48;
+  --game-danger-strong: #772e40;
+  --game-violet: #d4baff;
+  --game-violet-soft: #30273e;
+  --game-violet-line: #554568;
+  --game-violet-strong: #503663;
+  --game-pink: #f9add5;
+  --game-pink-soft: #392537;
+  --game-pink-line: #714365;
+  --game-pink-strong: #6c3457;
+  --game-on-color: #f8fff8;
+  --game-on-accent: #0c110f;
+  --game-scrim: rgb(4 10 7 / 74%);
+  --game-stadium-art: url('/assets/images/stadium-night.jpg');
+  color-scheme: dark;
+}
+
+body {
+  background: var(--game-bg);
+  color: var(--game-ink);
+  font-family: var(--font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--game-accent);
+  outline-offset: 3px;
+}
+
+::-webkit-scrollbar-track { background: var(--game-bg); }
+::-webkit-scrollbar-thumb { background: #46574b; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+html { overflow-x: clip; }

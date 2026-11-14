@@ -1,0 +1,245 @@
+import { useTranslation } from '../../i18n';
+import React from 'react';
+import { UserCheck, Clock, CheckCircle2, AlertTriangle, Send } from 'lucide-react';
+import { StaffDetailResponse } from '../../services/transfers.service';
+import { RoleBadge } from '../common/RoleBadge';
+
+interface Props {
+  detail: StaffDetailResponse | null;
+  isCurrentOwnStaff: boolean;
+  proposedWage: number;
+  contractYears: number;
+  signingBonus: number;
+  roleOffered: string;
+  submittingOffer: boolean;
+  offerSuccess: string;
+  offerError: string;
+  currentClubId?: string;
+  formatMoney: (val: number) => string;
+  setProposedWage: (val: number) => void;
+  setContractYears: (val: number) => void;
+  setSigningBonus: (val: number) => void;
+  setRoleOffered: (val: string) => void;
+  handleSubmitOffer: () => void;
+  onOpenCancelConfirm: () => void;
+}
+
+export const StaffOfferTab: React.FC<Props> = ({
+  detail,
+  isCurrentOwnStaff,
+  proposedWage,
+  contractYears,
+  signingBonus,
+  roleOffered,
+  submittingOffer,
+  offerSuccess,
+  offerError,
+  formatMoney,
+  setProposedWage,
+  setContractYears,
+  setSigningBonus,
+  setRoleOffered,
+  handleSubmitOffer,
+  onOpenCancelConfirm,
+}) => {
+  const { t } = useTranslation();
+
+  if (isCurrentOwnStaff) {
+    return (
+      <div
+        style={{
+          background: 'var(--game-accent-soft)',
+          border: '1px solid var(--game-green-line)',
+          borderRadius: '12px',
+          padding: '1.5rem',
+          textAlign: 'center',
+          color: 'var(--game-accent)',
+        }}
+      >
+        <UserCheck size={36} color="var(--game-accent)" style={{ margin: '0 auto 0.5rem' }} />
+        <h4 style={{ margin: '0 0 0.5rem 0', fontWeight: 800 }}>{t('staff.belongs_to_you', 'Nhân Sự Này Đang Thuộc CLB Của Bạn')}</h4>
+        <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--game-accent)' }}>
+          {t('staff.contract_active_wage', 'Hợp đồng hiện tại đang có hiệu lực với mức lương {wage} / tuần.').replace('{wage}', formatMoney(detail?.currentContract?.salary || 0))}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Đề nghị đang chờ (nếu có) */}
+      {detail?.existingOffer && (
+        <div
+          style={{
+            background: 'var(--game-gold-soft)',
+            border: '1px solid var(--game-gold-line)',
+            borderRadius: '12px',
+            padding: '1rem 1.25rem',
+            marginBottom: '1.25rem',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, color: 'var(--game-gold)', fontSize: '0.9rem' }}>
+              <Clock size={16} /> {t('staff.has_pending_offer', 'Đang có lời đề nghị chờ phản hồi')}
+            </span>
+            <span style={{ fontSize: '0.78rem', background: 'var(--game-gold-soft)', color: 'var(--game-gold)', fontWeight: 700, padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+              {detail.existingOffer.status}
+            </span>
+          </div>
+
+          <div style={{ fontSize: '0.84rem', color: 'var(--game-gold)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span>{t('staff.role_label', 'Vai trò:')}</span>
+              <RoleBadge role={detail.existingOffer.role_offered || 'HEAD_COACH'} size="sm" />
+            </div>
+            <div>{t('staff.proposed_wage_label', 'Lương đề xuất:')} <strong>{formatMoney(detail.existingOffer.proposed_wage)} {t('staff.per_week', '/ tuần')}</strong></div>
+            <div>{t('staff.duration_label', 'Thời hạn:')} <strong>{t('staff.years_count', '{count} năm').replace('{count}', String(detail.existingOffer.contract_years))}</strong></div>
+            {detail.existingOffer.signing_bonus > 0 && (
+              <div>{t('staff.signing_bonus_item', 'Lót tay:')} <strong>{formatMoney(detail.existingOffer.signing_bonus)}</strong></div>
+            )}
+          </div>
+
+          <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={onOpenCancelConfirm}
+              className="btn btn-sm"
+              style={{
+                background: 'var(--game-danger-soft)',
+                color: 'var(--game-danger)',
+                border: '1px solid var(--game-danger-line)',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                borderRadius: '6px',
+                padding: '0.35rem 0.85rem',
+                cursor: 'pointer',
+              }}
+            >
+              {t('staff.cancel_this_offer', 'Hủy Đề Nghị Này')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {offerSuccess && (
+        <div style={{ background: 'var(--game-accent-soft)', color: 'var(--game-accent)', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <CheckCircle2 size={16} /> {offerSuccess}
+        </div>
+      )}
+
+      {offerError && (
+        <div style={{ background: 'var(--game-danger-soft)', color: 'var(--game-danger)', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <AlertTriangle size={16} /> {offerError}
+        </div>
+      )}
+
+      {/* Form đề nghị */}
+      <div style={{ background: 'var(--game-input)', border: '1px solid var(--game-line)', borderRadius: '12px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'var(--game-ink)' }}>
+          {detail?.existingOffer ? t('staff.update_offer_title', 'Cập Nhật Lời Đề Nghị Tuyển Mộ') : t('staff.send_new_offer_title', 'Gửi Lời Đề Nghị Tuyển Mộ Mới')}
+        </h4>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+          {/* Vai trò */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--game-text)', marginBottom: '0.35rem' }}>
+              {t('staff.role_assign_label', 'Vai trò bổ nhiệm')}
+            </label>
+            <select
+              value={roleOffered}
+              onChange={(e) => setRoleOffered(e.target.value)}
+              style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '8px', border: '1px solid var(--game-line-strong)', fontSize: '0.88rem', background: 'var(--game-surface)', fontWeight: 600 }}
+            >
+              <optgroup label={t('staff.optgroup_coaching', 'Ban Huấn Luyện Đội Một (First Team)')}>
+                <option value="HEAD_COACH">{t('staff.head_coach', 'HLV Trưởng')}</option>
+                <option value="ASSISTANT_COACH">{t('staff.assistant_coach', 'Trợ Lý HLV')}</option>
+                <option value="FITNESS_COACH">{t('staff.fitness_coach', 'HLV Thể Lực')}</option>
+                <option value="GOALKEEPING_COACH">{t('staff.gk_coach', 'HLV Thủ Môn')}</option>
+              </optgroup>
+              <optgroup label={t('staff.optgroup_youth_team', 'Đội Trẻ U21 & Học Viện (Youth Team)')}>
+                <option value="HEAD_COACH_YOUTH">{t('staff.head_coach_youth', 'HLV Trưởng Đội Trẻ U21')}</option>
+                <option value="ASSISTANT_COACH_YOUTH">{t('staff.assistant_coach_youth', 'Trợ Lý HLV Đội Trẻ U21')}</option>
+                <option value="YOUTH_DIRECTOR">{t('staff.youth_director', 'Giám Đốc Đào Tạo Trẻ')}</option>
+              </optgroup>
+              <optgroup label={t('staff.optgroup_scouting', 'Bộ Phận Tuyển Trạch (Scouting)')}>
+                <option value="SCOUT_DIRECTOR">{t('staff.scout_director', 'Giám Đốc Tuyển Trạch')}</option>
+                <option value="SCOUT">{t('staff.scout', 'Tuyển Trạch Viên')}</option>
+              </optgroup>
+              <optgroup label={t('staff.optgroup_medical', 'Bộ Phận Y Tế & Thể Trạng (Medical)')}>
+                <option value="PHYSIO_DIRECTOR">{t('staff.physio_director', 'Giám Đốc Y Tế')}</option>
+                <option value="PHYSIO">{t('staff.physio', 'Bác Sĩ / Trị Liệu')}</option>
+              </optgroup>
+              <optgroup label={t('staff.optgroup_director', 'Ban Giám Đốc (Board & Directors)')}>
+                <option value="TECHNICAL_DIRECTOR">{t('staff.technical_director', 'Giám Đốc Kỹ Thuật')}</option>
+                <option value="FINANCIAL_DIRECTOR">{t('staff.financial_director', 'Giám Đốc Tài Chính')}</option>
+              </optgroup>
+            </select>
+          </div>
+
+          {/* Lương tuần */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--game-text)', marginBottom: '0.35rem' }}>
+              {t('staff.proposed_weekly_wage_label', 'Lương tuần đề xuất (€)')}
+            </label>
+            <input
+              type="number"
+              step="500"
+              value={proposedWage}
+              onChange={(e) => setProposedWage(Number(e.target.value))}
+              style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '8px', border: '1px solid var(--game-line-strong)', fontSize: '0.88rem', fontWeight: 700, color: 'var(--game-ink)' }}
+            />
+            <div style={{ fontSize: '0.72rem', color: 'var(--game-muted)', marginTop: '0.2rem' }}>
+              {t('staff.estimated_wage_label', 'Mức lương ước tính: {wage} / tuần').replace('{wage}', formatMoney(detail?.estimatedWage || 0))}
+            </div>
+          </div>
+
+          {/* Hạn hợp đồng */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--game-text)', marginBottom: '0.35rem' }}>
+              {t('staff.contract_duration_label', 'Thời hạn hợp đồng')}
+            </label>
+            <select
+              value={contractYears}
+              onChange={(e) => setContractYears(Number(e.target.value))}
+              style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '8px', border: '1px solid var(--game-line-strong)', fontSize: '0.88rem', background: 'var(--game-surface)', fontWeight: 600 }}
+            >
+              <option value={1}>{t('staff.year_n', '{n} Năm').replace('{n}', '1')}</option>
+              <option value={2}>{t('staff.year_n', '{n} Năm').replace('{n}', '2')}</option>
+              <option value={3}>{t('staff.year_n', '{n} Năm').replace('{n}', '3')}</option>
+              <option value={4}>{t('staff.year_n', '{n} Năm').replace('{n}', '4')}</option>
+              <option value={5}>{t('staff.year_n', '{n} Năm').replace('{n}', '5')}</option>
+            </select>
+          </div>
+
+          {/* Phí lót tay */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--game-text)', marginBottom: '0.35rem' }}>
+              {t('staff.signing_bonus_label', 'Phí lót tay ký hợp đồng (€)')}
+            </label>
+            <input
+              type="number"
+              step="5000"
+              value={signingBonus}
+              onChange={(e) => setSigningBonus(Number(e.target.value))}
+              style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '8px', border: '1px solid var(--game-line-strong)', fontSize: '0.88rem', fontWeight: 700, color: 'var(--game-ink)' }}
+            />
+          </div>
+        </div>
+
+        {/* Nút gửi */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+          <button
+            type="button"
+            disabled={submittingOffer}
+            onClick={handleSubmitOffer}
+            className="btn btn-primary flex-center"
+            style={{ padding: '0.65rem 1.4rem', fontWeight: 800, gap: '0.45rem', borderRadius: '8px', boxShadow: '0 2px 6px rgba(22, 163, 74, 0.25)' }}
+          >
+            <Send size={16} />
+            <span>{submittingOffer ? t('staff.sending', 'Đang gửi...') : detail?.existingOffer ? t('staff.update_offer_btn', 'Cập Nhật Đề Nghị') : t('staff.send_offer_btn', 'Gửi Lời Đề Nghị Tuyển Mộ')}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,210 @@
+.game-feature {
+  @apply grid min-w-0 gap-4;
+}
+.game-feature-heading {
+  @apply relative isolate flex min-h-[94px] min-w-0 items-center gap-3 overflow-hidden rounded-sm px-4 sm:min-h-[110px] sm:px-6;
+  border: 1px solid var(--game-line);
+  border-left: 2px solid var(--game-accent);
+  background: linear-gradient(90deg, #131e17 25%, #131e17a1 100%), var(--game-stadium-art) 50% 43% / cover;
+}
+.game-feature-heading svg { @apply shrink-0; color: var(--game-accent); }
+.game-feature-heading h1 {
+  @apply font-game text-[clamp(2rem,4vw,3.75rem)] leading-none font-extrabold tracking-tight uppercase;
+  color: var(--game-ink);
+}
+.game-feature-body {
+  @apply min-w-0 overflow-x-auto rounded-sm;
+  color: var(--game-ink);
+  background: var(--game-rail);
+  border: 1px solid var(--game-line);
+}
+.game-feature-body > :is(.view-container, .trophies-view-container, .match-season-view, .tactics-main-layout) {
+  @apply p-3 sm:p-4;
+}
+.game-feature-body .standings-page { padding: 0.75rem !important; }
+.game-feature-body :is(.glass-panel, .card) { border-color: var(--game-line); border-radius: 5px; }
+.game-feature-body :is(.card-title, .view-header h2, .match-season-header h2) { font-family: var(--font-game); }
+
+.onboarding-arena-page {
+  background: linear-gradient(145deg, #0b1511f0 16%, #1b2a21b5), var(--game-stadium-art) center / cover fixed;
+}
+.onboarding-arena-page .onboarding-topbar-hud { background: var(--game-surface); border-color: var(--game-line); }
+.onboarding-arena-page .onboarding-brand-hud h2, .onboarding-arena-page .user-greeting-pill { color: var(--game-ink); }
+.onboarding-arena-page .onboarding-stepper-hud { background: var(--game-rail); border-color: var(--game-line); }
+.onboarding-arena-page .stepper-label-hud strong, .onboarding-arena-page .stepper-label-hud span { color: var(--game-muted); }
+.onboarding-arena-page .onboarding-card-hud { color: var(--game-ink); }
+
+.game-route-loading {
+  @apply flex min-h-[35vh] items-center justify-center gap-2 text-sm font-semibold;
+}
+
+.club-transfers { @apply grid min-w-0 gap-5; }
+.club-transfers-header { @apply flex flex-wrap items-center justify-between gap-3; }
+.club-transfers-title { @apply flex items-center gap-3; }
+.club-transfers-title h1 {
+  @apply text-[clamp(1.65rem,3vw,2.4rem)] leading-tight font-bold tracking-tight;
+}
+.club-transfers-title > span {
+  @apply grid size-11 shrink-0 place-items-center rounded-xl sm:size-12;
+  background: var(--game-accent);
+  color: var(--game-on-accent);
+}
+.club-transfers-season {
+  @apply inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold;
+  border-color: var(--game-line);
+  color: var(--game-muted);
+}
+.club-transfers-season svg { color: var(--game-accent); }
+.club-transfer-controls {
+  @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b;
+  border-color: var(--game-line);
+}
+.club-transfer-tabs, .club-transfer-directions { @apply flex flex-wrap items-center gap-1; }
+.club-transfer-tabs a, .club-transfer-directions a {
+  @apply inline-flex min-h-10 items-center justify-center gap-2 whitespace-nowrap px-3 text-sm font-semibold;
+  color: var(--game-muted);
+}
+.club-transfer-tabs a {
+  @apply -mb-px min-h-12 rounded-t-md border-b-2 border-transparent px-3 sm:px-4;
+}
+.club-transfer-tabs a:hover, .club-transfer-directions a:hover { color: var(--game-ink); }
+.club-transfer-tabs a[aria-current] {
+  border-color: var(--game-accent);
+  color: var(--game-accent);
+}
+.club-transfer-directions {
+  @apply mb-2 rounded-lg p-1 sm:mb-1;
+  background: var(--game-raised);
+}
+.club-transfer-directions a { @apply min-h-8 rounded-md text-xs; }
+.club-transfer-directions a[aria-current] {
+  background: var(--game-accent-soft);
+  color: var(--game-accent);
+}
+.club-transfer-section {
+  @apply min-w-0 overflow-hidden rounded-xl border;
+  border-color: var(--game-line);
+  background: var(--game-rail);
+}
+.club-transfer-section > header {
+  @apply flex min-h-14 items-center gap-2.5 px-4 pt-1 sm:px-5;
+}
+.club-transfer-section h2 { @apply text-base font-semibold tracking-tight; }
+.club-transfer-section-icon { color: var(--game-accent); }
+.club-transfer-count {
+  @apply rounded-full px-2 py-0.5 text-xs font-semibold;
+  background: var(--game-accent-soft);
+  color: var(--game-accent);
+}
+.club-transfer-cards { @apply grid list-none gap-3 px-4 pb-4 sm:px-5 sm:pb-5; }
+.club-transfer-card { @apply min-w-0 overflow-hidden rounded-lg border; border-color: var(--game-line); }
+.club-transfer-card-heading {
+  @apply flex flex-wrap items-center justify-between gap-2 px-3 py-3 sm:px-4;
+  background: var(--game-raised);
+}
+.club-transfer-card-heading > span, .club-transfer-meta { @apply text-xs; color: var(--game-muted); }
+.club-transfer-person { @apply flex min-w-0 items-center gap-3; }
+.club-transfer-person .player-avatar-sm { @apply size-10 shrink-0; }
+.club-transfer-profile { @apply cursor-pointer text-left font-bold; }
+.club-transfer-profile:hover { @apply underline; color: var(--game-accent); }
+.club-transfer-meta { @apply mt-1 flex flex-wrap items-center gap-x-2 gap-y-1; }
+.club-transfer-offers { @apply list-none; }
+.club-transfer-offer {
+  @apply grid items-center gap-3 border-t p-3 sm:px-4;
+  border-color: var(--game-line);
+  background: var(--game-surface);
+}
+.club-transfer-offer-club { @apply flex items-start gap-2; }
+.club-transfer-offer-club svg { @apply mt-0.5 shrink-0; color: var(--game-dim); }
+.club-transfer-time {
+  @apply inline-flex whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium;
+  background: var(--game-raised);
+  color: var(--game-text);
+}
+.club-transfer-offer-club .club-transfer-time { @apply mt-1 flex w-fit p-0; background: transparent; color: var(--game-muted); }
+.club-transfer-time-unknown { color: var(--game-dim); }
+.club-transfer-offer dl { @apply flex flex-wrap gap-x-4 gap-y-2; }
+.club-transfer-offer dt { @apply text-xs; color: var(--game-muted); }
+.club-transfer-offer dd { @apply font-semibold; }
+.club-transfer-actions { @apply flex flex-wrap items-center gap-2; }
+.club-transfer-empty, .club-transfer-error { @apply flex flex-wrap items-center gap-2 px-4 pb-4 text-sm sm:px-5; color: var(--game-muted); }
+.club-transfer-empty-active {
+  @apply min-h-24 gap-4 rounded-lg p-4 sm:p-5;
+  margin: 0 1rem 1rem;
+  background: var(--game-surface);
+}
+.club-transfer-empty-icon {
+  @apply grid size-11 shrink-0 place-items-center rounded-lg;
+  background: var(--game-raised);
+  color: var(--game-muted);
+}
+.club-transfer-empty-active a { @apply mt-2 inline-flex items-center gap-2 font-semibold; color: var(--game-accent); }
+.club-transfer-empty-active a:hover { @apply underline; }
+.club-transfer-error { color: var(--game-danger); }
+.club-transfer-table { @apply overflow-x-auto border-t; border-color: var(--game-line); }
+.club-transfer-table th { @apply font-medium; background: var(--game-surface); }
+.club-transfer-table th, .club-transfer-amount { @apply whitespace-nowrap; }
+.club-transfer-table th:last-child, .club-transfer-table td:last-child { @apply text-right; }
+.club-transfer-table .club-transfer-person { @apply min-w-40; }
+.club-transfer-amount { @apply font-mono font-semibold; }
+
+@media (max-width: 760px) {
+  .club-transfer-table .table-hud thead { @apply sr-only; }
+  .club-transfer-table :is(table, tbody) { @apply block; }
+  .club-transfer-table tbody tr {
+    @apply grid grid-cols-2 gap-x-3 gap-y-2 border-b px-4 py-3;
+    border-color: var(--game-line);
+  }
+  .club-transfer-table tbody tr:last-child { @apply border-b-0; }
+  .club-transfer-table .table-hud td { @apply block border-0 p-0 text-left; }
+  .club-transfer-table td:first-child { @apply col-span-full mb-1; }
+  .club-transfer-table td[data-label]::before {
+    content: attr(data-label);
+    @apply mb-0.5 block font-sans text-xs font-medium;
+    color: var(--game-muted);
+  }
+}
+
+@media (min-width: 1080px) {
+  .club-transfer-offer { grid-template-columns: minmax(110px, 0.7fr) minmax(0, 2fr) auto; }
+}
+
+.game-feature-body .table-hud thead {
+  background: var(--game-raised);
+}
+.game-feature-body .table-hud thead th {
+  color: var(--game-muted);
+  font-weight: 800;
+}
+.game-feature-body .table-hud tr:hover td { background-color: var(--game-hover); }
+.game-feature-body .match-season-header, .game-feature-body .tactics-db-status-bar {
+  background: var(--game-raised);
+}
+.game-feature-body .season-fixture-card.my-match { border-left-color: var(--game-accent); }
+
+.game-feature-body :is(.btn, .input-select, .input-text),
+.onboarding-arena-page :is(.country-card-hud, .tier-card-hud, .onboarding-card-hud) {
+  border-radius: 6px;
+}
+
+:is(.btn-upgrade-hud, .btn-apply-coach-tactic, .btn-claim-random-hud, .btn-next-step-hud, .match-simulate-btn) {
+  background: var(--game-accent);
+  color: var(--game-on-accent);
+  box-shadow: none;
+}
+
+:is(.btn-upgrade-hud, .btn-apply-coach-tactic, .btn-claim-random-hud, .btn-next-step-hud, .match-simulate-btn):hover:not(:disabled) {
+  background: var(--game-accent-hover);
+  box-shadow: none;
+}
+
+:is(.input-select, .input-text):focus-visible {
+  outline: 2px solid var(--game-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .game-feature-body .tactics-main-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
