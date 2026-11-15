@@ -102,7 +102,18 @@
   @apply flex flex-wrap items-center justify-between gap-2 px-3 py-3 sm:px-4;
   background: var(--game-raised);
 }
-.club-transfer-card-heading > span, .club-transfer-meta { @apply text-xs; color: var(--game-muted); }
+.club-transfer-card-status, .club-transfer-meta { @apply text-xs; color: var(--game-muted); }
+.club-transfer-card-status { @apply flex flex-wrap items-center gap-2; }
+.club-transfer-listing {
+  @apply rounded-md px-2 py-1 font-semibold;
+  background: var(--game-accent-soft);
+  color: var(--game-accent);
+}
+.club-transfer-no-offers {
+  @apply border-t px-3 py-3 text-sm sm:px-4;
+  border-color: var(--game-line);
+  color: var(--game-muted);
+}
 .club-transfer-person { @apply flex min-w-0 items-center gap-3; }
 .club-transfer-person .player-avatar-sm { @apply size-10 shrink-0; }
 .club-transfer-profile { @apply cursor-pointer text-left font-bold; }

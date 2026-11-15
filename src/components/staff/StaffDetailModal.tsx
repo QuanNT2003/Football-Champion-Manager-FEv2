@@ -25,6 +25,18 @@ import { StaffContractTab } from './StaffContractTab';
 import { RenewContractModal } from '../common/RenewContractModal';
 import { getFacepackUrl, formatCurrency } from '../../utils/formatters';
 
+function defaultOfferRole(staffType: string) {
+  switch (staffType) {
+    case 'SCOUT':
+    case 'PHYSIO':
+      return staffType;
+    case 'DIRECTOR':
+      return 'YOUTH_DIRECTOR';
+    default:
+      return 'HEAD_COACH';
+  }
+}
+
 export interface Props {
   staff: StaffMarketItem;
   staffList?: StaffMarketItem[];
@@ -54,7 +66,7 @@ export const StaffDetailModal: React.FC<Props> = ({
   const [proposedWage, setProposedWage] = useState<number>(staff.wage || 5000);
   const [contractYears, setContractYears] = useState<number>(2);
   const [signingBonus, setSigningBonus] = useState<number>(staff.signingFee || 0);
-  const [roleOffered, setRoleOffered] = useState<string>(staff.staffType || 'HEAD_COACH');
+  const [roleOffered, setRoleOffered] = useState(() => defaultOfferRole(staff.staffType));
   const [submittingOffer, setSubmittingOffer] = useState<boolean>(false);
   const [offerSuccess, setOfferSuccess] = useState<string>('');
   const [offerError, setOfferError] = useState<string>('');
@@ -114,7 +126,7 @@ export const StaffDetailModal: React.FC<Props> = ({
         setProposedWage(data.existingOffer?.proposed_wage || data.estimatedWage || 5000);
         setContractYears(data.existingOffer?.contract_years || 2);
         setSigningBonus(data.existingOffer?.signing_bonus || 0);
-        setRoleOffered(data.existingOffer?.role_offered || data.staffType || 'HEAD_COACH');
+        setRoleOffered(data.existingOffer?.role_offered || defaultOfferRole(data.staffType));
       }
     } catch (err: any) {
       console.error('Failed to load staff detail:', err);

@@ -310,6 +310,7 @@ export function App() {
             <ClubTransfersView
               currentClubId={club?.id || '1'}
               cashBalance={cashBalance}
+              players={players}
               season={timeline?.season}
               onRefreshFinance={refreshClubData}
             />

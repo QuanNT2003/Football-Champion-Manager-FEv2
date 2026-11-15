@@ -405,6 +405,8 @@ export const en: Translations = {
   'club_transfers.departure_history': 'Departure history',
   'club_transfers.empty_sent': 'Your club has no offers awaiting a response.',
   'club_transfers.empty_received': 'There are no pending offers from other clubs.',
+  'club_transfers.empty_player_departures': 'No players are listed for sale or loan or have pending offers.',
+  'club_transfers.no_player_offers': 'No offers yet.',
   'club_transfers.season_column': 'Season',
   'club_transfers.game_day': 'Season {season} · Day {day}',
   'club_transfers.game_season': 'Season {season}',

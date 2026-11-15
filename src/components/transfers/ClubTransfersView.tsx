@@ -15,6 +15,7 @@ import { ClubTransferDirection, TransferCard, TransferHistoryRow, TransferOfferA
 interface ClubTransfersViewProps {
   currentClubId: string;
   cashBalance: number;
+  players: Player[];
   season?: TimelineData['season'];
   onRefreshFinance: () => void;
 }
@@ -52,7 +53,7 @@ function staffPerson(staff: TransferStaffSummary): TransferPerson {
   };
 }
 
-export function ClubTransfersView({ currentClubId, cashBalance, season, onRefreshFinance }: ClubTransfersViewProps) {
+export function ClubTransfersView({ currentClubId, cashBalance, players, season, onRefreshFinance }: ClubTransfersViewProps) {
   const { t } = useTranslation();
   const [params] = useSearchParams();
   const tab = params.get('tab') === 'staff' ? 'staff' : 'players';
@@ -106,6 +107,28 @@ export function ClubTransfersView({ currentClubId, cashBalance, season, onRefres
   }
 
   if (data?.tab === 'players') {
+    if (!arriving) {
+      for (const player of players) {
+        const status = player.status ?? player.player_status;
+        const listingLabels = [
+          ...(status?.is_transfer_listed ? [t('transfers.status_transfer')] : []),
+          ...(status?.is_loan_listed ? [t('transfers.status_loan')] : []),
+        ];
+        if (listingLabels.length === 0) continue;
+
+        cards.set(player.id, {
+          person: {
+            id: player.id, kind: 'players', name: player.common_name || player.name || `${player.first_name} ${player.last_name}`.trim(),
+            position: player.position?.code, photo: player.photo_url, age: player.age,
+            rating: player.ovr ?? player.overall_rating,
+          },
+          listingLabels,
+          openProfile: () => setSelectedPlayer({ ...player, club_id: currentClubId }),
+          offers: [],
+        });
+      }
+    }
+
     for (const offer of data.offers[arriving ? 'outgoing' : 'incoming']) {
       if (offer.status !== 'PENDING') continue;
       const player = offer.player;

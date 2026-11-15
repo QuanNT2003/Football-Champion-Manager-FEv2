@@ -30,6 +30,7 @@ export interface TransferOfferAction {
 export interface TransferCard {
   person: TransferPerson;
   openProfile?: () => void;
+  listingLabels?: string[];
   offers: Array<{
     id: string;
     club: string;
@@ -108,13 +109,18 @@ export function ClubTransferDirection({ direction, kind, cards, history, loading
         {loading && <p className="club-transfer-empty" role="status"><Loader2 className="animate-spin" size={16} />{t('common.loading')}</p>}
         {cards && (cards.length ? (
           <ul className="club-transfer-cards">
-            {cards.map(({ person, openProfile, offers }) => (
+            {cards.map(({ person, openProfile, listingLabels, offers }) => (
               <li key={person.id} className="club-transfer-card">
                 <div className="club-transfer-card-heading">
                   <PersonSummary person={person} onOpen={openProfile} />
-                  <span>{t(arriving ? 'club_transfers.our_offers' : 'club_transfers.received_offers', { count: offers.length })}</span>
+                  <div className="club-transfer-card-status">
+                    {listingLabels?.map(label => <span key={label} className="club-transfer-listing">{label}</span>)}
+                    {offers.length > 0 && <span>{t(arriving ? 'club_transfers.our_offers' : 'club_transfers.received_offers', { count: offers.length })}</span>}
+                  </div>
                 </div>
-                <ul className="club-transfer-offers">
+                {offers.length === 0 ? (
+                  <p className="club-transfer-no-offers">{t('club_transfers.no_player_offers')}</p>
+                ) : <ul className="club-transfer-offers">
                   {offers.map(offer => (
                     <li key={offer.id} className="club-transfer-offer">
                       <div className="club-transfer-offer-club">
@@ -140,7 +146,7 @@ export function ClubTransferDirection({ direction, kind, cards, history, loading
                       )}
                     </li>
                   ))}
-                </ul>
+                </ul>}
               </li>
             ))}
           </ul>
@@ -148,7 +154,7 @@ export function ClubTransferDirection({ direction, kind, cards, history, loading
           <div className="club-transfer-empty club-transfer-empty-active">
             <span className="club-transfer-empty-icon"><Inbox size={24} aria-hidden="true" /></span>
             <div>
-              <p>{t(arriving ? 'club_transfers.empty_sent' : 'club_transfers.empty_received')}</p>
+              <p>{t(arriving ? 'club_transfers.empty_sent' : kind === 'players' ? 'club_transfers.empty_player_departures' : 'club_transfers.empty_received')}</p>
               {arriving && (
                 <Link to={kind === 'staff' ? '/transfers?tab=staff' : '/transfers'}>
                   {t('v2.transferMarket')}<ArrowRight size={15} aria-hidden="true" />

@@ -170,7 +170,6 @@ export const StaffOfferTab: React.FC<Props> = ({
                 <option value="PHYSIO">{t('staff.physio', 'Bác Sĩ / Trị Liệu')}</option>
               </optgroup>
               <optgroup label={t('staff.optgroup_director', 'Ban Giám Đốc (Board & Directors)')}>
-                <option value="TECHNICAL_DIRECTOR">{t('staff.technical_director', 'Giám Đốc Kỹ Thuật')}</option>
                 <option value="FINANCIAL_DIRECTOR">{t('staff.financial_director', 'Giám Đốc Tài Chính')}</option>
               </optgroup>
             </select>

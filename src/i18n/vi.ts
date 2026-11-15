@@ -405,6 +405,8 @@ export const vi: Translations = {
   'club_transfers.departure_history': 'Lịch sử chiều đi',
   'club_transfers.empty_sent': 'CLB chưa có đề nghị nào đang chờ phản hồi.',
   'club_transfers.empty_received': 'Chưa có đề nghị nào từ các CLB khác.',
+  'club_transfers.empty_player_departures': 'Chưa có cầu thủ nào được rao bán, cho mượn hoặc nhận đề nghị.',
+  'club_transfers.no_player_offers': 'Chưa có đề nghị.',
   'club_transfers.season_column': 'Mùa giải',
   'club_transfers.game_day': 'Mùa {season} · Ngày {day}',
   'club_transfers.game_season': 'Mùa {season}',
