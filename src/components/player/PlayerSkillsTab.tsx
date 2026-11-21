@@ -100,6 +100,12 @@ export const PlayerSkillsTab: React.FC<Props> = ({
           <span className="fm-legend-bar fm-legend-secondary" />
           <span>{t('skills.legend_preferred', 'Chỉ số bổ trợ')}</span>
         </span>
+        {detail?.is_own_club && <span className="fm-legend-item">
+          <span className="fm-attr-growth">(+N)</span>
+          <span>{detail.skills?.growth_season
+            ? t('skills.season_growth_legend', { season: detail.skills.growth_season })
+            : t('skills.season_growth_current')}</span>
+        </span>}
       </div>
 
       {/* Multi-Column Categories Layout */}

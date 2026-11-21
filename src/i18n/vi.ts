@@ -1,6 +1,11 @@
 import { Translations } from './types';
+import { trainingVi } from './training';
 
 export const vi: Translations = {
+  ...trainingVi,
+  "skills.season_growth_value": "Thay đổi chỉ số mùa này: {growth}",
+  "skills.season_growth_legend": "Thay đổi chỉ số trong mùa {season}",
+  "skills.season_growth_current": "Thay đổi chỉ số mùa này",
   "academy.nav": "Học viện trẻ",
   "academy.eyebrow": "Phát triển tài năng",
   "academy.title": "Học viện bóng đá trẻ",

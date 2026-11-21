@@ -1,0 +1,34 @@
+.training-players-dialog { width: min(880px, calc(100vw - 28px)); max-height: min(86dvh, 800px); padding: 0; margin: auto; overflow: hidden; color: var(--game-ink, #eff7f1); background: var(--game-surface, #141d18); border: 1px solid var(--game-line, #2a392f); border-radius: 14px; box-shadow: 0 24px 80px #0008; }
+.training-players-dialog[open] { display: flex; flex-direction: column; }
+.training-players-dialog::backdrop { background: var(--game-scrim, #000a); backdrop-filter: blur(5px); }
+.training-players-dialog button, .training-players-dialog input { font: inherit; }
+.training-players-dialog button { cursor: pointer; }
+.training-players-dialog :focus-visible { outline: 2px solid var(--game-accent, #beff55); outline-offset: 3px; }
+.training-players-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 22px; }
+.training-players-header h2 { display: flex; align-items: center; gap: 9px; font-size: 20px; margin: 0 0 8px; }
+.training-players-header h2 svg { color: var(--game-accent, #beff55); }
+.training-players-header p { color: var(--game-muted, #a1b2a7); font-size: 11px; line-height: 1.65; margin: 0; }
+.training-players-close { display: grid; place-items: center; padding: 7px; background: var(--game-raised, #1b2720); color: var(--game-muted, #a1b2a7); border: 1px solid var(--game-line, #2a392f); border-radius: 7px; }
+.training-players-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 0 22px 18px; border-bottom: 1px solid var(--game-line, #2a392f); }
+.training-players-search { display: flex; align-items: center; gap: 8px; color: var(--game-muted, #a1b2a7); padding: 8px 10px; border: 1px solid var(--game-line, #2a392f); border-radius: 7px; background: var(--game-raised, #1b2720); }
+.training-players-search input { background: transparent; border: 0; outline: none; min-width: 0; width: 180px; color: var(--game-ink, #eff7f1); font-size: 12px; }
+.training-players-body { overflow: auto; min-height: 0; padding: 0 22px; }
+.training-players-table { width: 100%; min-width: 570px; border-collapse: collapse; text-align: left; font-size: 12px; }
+.training-players-table th, .training-players-table td { padding: 14px 9px; border-bottom: 1px solid var(--game-line, #2a392f); }
+.training-players-table thead th { position: sticky; top: 0; background: var(--game-surface, #141d18); color: var(--game-muted, #a1b2a7); font-size: 10px; font-weight: 500; }
+.training-players-table tbody th { font-weight: 600; }
+.training-players-table input { width: 15px; height: 15px; accent-color: var(--game-accent, #beff55); cursor: pointer; }
+.training-players-table input:disabled { cursor: not-allowed; opacity: .4; }
+.training-players-table .is-selected { background: var(--game-accent-soft, #253924); }
+.training-players-table td > span:not(.training-player-status) { color: var(--game-muted, #a1b2a7); margin: 0 3px; }
+.training-players-table .is-low-fitness { color: var(--game-gold, #f0b581); }
+.training-player-status { color: var(--game-muted, #a1b2a7); font-size: 10px; }
+.training-player-status.is-ready { color: var(--game-accent, #beff55); }
+.training-players-empty { color: var(--game-muted, #a1b2a7); font-size: 12px; padding: 30px 10px; text-align: center; }
+.training-players-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; border-top: 1px solid var(--game-line, #2a392f); }
+.training-players-footer > span { font-size: 12px; color: var(--game-muted, #a1b2a7); }
+.training-players-footer > div { display: flex; gap: 9px; }
+.training-players-footer button { border: 1px solid var(--game-line, #2a392f); background: var(--game-raised, #1b2720); color: var(--game-ink, #eff7f1); padding: 10px 14px; border-radius: 7px; font-size: 12px; }
+.training-players-footer button.is-primary { background: var(--game-accent, #beff55); color: var(--game-on-accent, #15210f); border-color: var(--game-accent, #beff55); font-weight: 700; }
+@media (max-width: 600px) { .training-players-header { padding: 18px; } .training-players-toolbar { padding: 0 18px 14px; } .training-players-body { padding: 0 8px; } .training-players-footer { padding: 15px; align-items: stretch; flex-direction: column; gap: 12px; } .training-players-footer > div { justify-content: flex-end; } }
+.training-players-team-count { font-size: 12px; color: var(--game-muted, #a1b2a7); }

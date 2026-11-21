@@ -344,6 +344,7 @@ export function App() {
           element={
             <TrainingView
               currentClubId={club?.id || '1'}
+              onSquadChanged={refreshClubData}
             />
           }
         />

@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
+    "test:training": "node --test test/training.test.cjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",

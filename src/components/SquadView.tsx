@@ -246,7 +246,7 @@ export const SquadView: React.FC<Props> = ({ players, onSelectPlayer, onRefreshS
               </tr>
             ) : (
               filtered.map((player) => {
-                const condition = player.status?.condition ?? 90;
+                const fitness = player.status?.fitness ?? player.player_status?.fitness;
                 const ovr = getOvrRating(player);
                 const posCode = player.position?.code || player.player_positions?.[0]?.position_code || 'ST';
                 const posCategory = getPositionCategory(posCode);
@@ -330,13 +330,13 @@ export const SquadView: React.FC<Props> = ({ players, onSelectPlayer, onRefreshS
                           overflow: 'hidden'
                         }}>
                           <div style={{
-                            width: `${condition}%`,
+                            width: `${fitness ?? 0}%`,
                             height: '100%',
-                            background: condition > 75 ? 'var(--game-green-strong)' : condition > 50 ? 'var(--game-gold-strong)' : 'var(--game-danger-strong)'
+                            background: fitness == null ? 'var(--game-dim)' : fitness > 75 ? 'var(--game-green-strong)' : fitness > 50 ? 'var(--game-gold-strong)' : 'var(--game-danger-strong)'
                           }} />
                         </div>
                         <span style={{ fontSize: '0.78rem', fontFamily: 'var(--font-game)', color: 'var(--game-text)', fontWeight: 700 }}>
-                          {condition}%
+                          {fitness == null ? '—' : `${fitness}%`}
                         </span>
                       </div>
                     </td>

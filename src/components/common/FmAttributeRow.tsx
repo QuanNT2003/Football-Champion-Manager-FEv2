@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../i18n';
 
 export interface FmAttributeRowProps {
   name: string;
@@ -46,6 +47,7 @@ export const FmAttributeRow: React.FC<FmAttributeRowProps> = ({
   maxValue = 100,
   compact = false,
 }) => {
+  const { t } = useTranslation();
   // Determine highlight type: primary (green) vs secondary (blue) vs none
   const computedHighlight: 'primary' | 'secondary' | 'none' =
     highlightType !== undefined
@@ -89,7 +91,8 @@ export const FmAttributeRow: React.FC<FmAttributeRowProps> = ({
           <span
             className="fm-attr-growth"
             style={{ color: isPositiveGrowth ? 'var(--game-accent)' : 'var(--game-danger)' }}
-            title={`Tăng trưởng trong mùa: ${growthText}`}
+            title={t('skills.season_growth_value', { growth: growthText })}
+            aria-label={t('skills.season_growth_value', { growth: growthText })}
           >
             ({growthText})
           </span>

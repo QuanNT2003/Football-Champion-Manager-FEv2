@@ -211,7 +211,7 @@ export const ClubPlayersTab: React.FC<Props> = ({
                 const ovr = getOvrRating(player);
                 const playerName =
                   player.name || `${player.first_name || ''} ${player.last_name || ''}`.trim() || player.common_name || 'Player';
-                const condition = player.status?.condition ?? 95;
+                const fitness = player.status?.fitness ?? player.player_status?.fitness;
 
                 return (
                   <tr
@@ -276,14 +276,14 @@ export const ClubPlayersTab: React.FC<Props> = ({
                         <div style={{ width: '60px', height: '5px', background: 'var(--game-hover)', borderRadius: '3px', overflow: 'hidden' }}>
                           <div
                             style={{
-                              width: `${condition}%`,
+                              width: `${fitness ?? 0}%`,
                               height: '100%',
-                              background: condition > 75 ? 'var(--game-green-strong)' : condition > 50 ? 'var(--game-gold-strong)' : 'var(--game-danger-strong)',
+                              background: fitness == null ? 'var(--game-dim)' : fitness > 75 ? 'var(--game-green-strong)' : fitness > 50 ? 'var(--game-gold-strong)' : 'var(--game-danger-strong)',
                             }}
                           />
                         </div>
                         <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-game)', color: 'var(--game-text)', fontWeight: 700 }}>
-                          {condition}%
+                          {fitness == null ? '—' : `${fitness}%`}
                         </span>
                       </div>
                     </td>

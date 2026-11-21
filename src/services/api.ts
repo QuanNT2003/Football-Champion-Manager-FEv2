@@ -38,13 +38,8 @@ export const api = {
   exchangeGold: (clubId: string, packageId: string) =>
     financesApi.buyShopItem({ club_id: clubId, item_id: packageId }),
   getTrainingTypes: trainingApi.getTypes,
-  scheduleTraining: (clubId: string, data: { trainingTypeId: string; intensity?: number }) =>
-    trainingApi.scheduleSession({
-      club_id: clubId,
-      training_type_id: data.trainingTypeId,
-      intensity: data.intensity ?? 3,
-      session_date: new Date().toISOString(),
-    }),
+  scheduleTraining: (clubId: string, data: { trainingTypeIds: string[]; playerIds: string[]; squadType: 'FIRST_TEAM' | 'YOUTH' }) =>
+    trainingApi.scheduleSession(clubId, data.trainingTypeIds, data.playerIds, data.squadType),
 };
 
 export default api;

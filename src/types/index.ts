@@ -107,6 +107,7 @@ export interface PlayerPosition {
 
 export interface PlayerStatus {
   condition?: number;
+  /** Current fitness used by training and the squad fitness column (0–100). */
   fitness?: number;
   form?: number;
   morale?: number;
@@ -397,23 +398,56 @@ export interface ShopItem {
   is_active?: boolean;
 }
 
+export type TrainingSquad = 'FIRST_TEAM' | 'YOUTH';
 export interface TrainingType {
   id: string;
+  code: string;
   name: string;
+  category: string;
   description?: string;
-  attribute_focus?: string;
-  intensity?: number;
+  attributes: string[];
+  fitnessCost: number;
 }
-
+export interface TrainingPlayer {
+  id: string;
+  name: string;
+  age: number;
+  squadType: string;
+  fitness: number;
+  agePenalty: number;
+  eligible: boolean;
+  isInjured: boolean;
+  onNationalDuty: boolean;
+  chances: Record<string, number>;
+}
+export interface TrainingOverview {
+  squadType: TrainingSquad;
+  baseChance: number;
+  slots: number;
+  fitnessPerDrill: number;
+  fitnessCost: number;
+  level: number;
+  levelBonus: number;
+  types: TrainingType[];
+  coaches: Record<string, { name: string | null; skill: number; bonus: number }>;
+  recommendation: { style: string; headCoach: { name: string } | null; trainingTypeIds: string[] };
+  players: TrainingPlayer[];
+}
 export interface TrainingSession {
   id: string;
-  club_id: string;
-  training_type_id: string;
-  training_type?: TrainingType;
-  intensity: number;
+  status: string;
   session_date: string;
+  season_day: number;
+  training_types?: { name: string };
+  plan?: { squadType?: TrainingSquad; level: number; drills: { slot: number; name: string; attributes: string[] }[] };
+  results?: {
+    completedAt: string;
+    players: {
+      id: string; name: string; fitnessBefore: number; fitnessAfter: number;
+      drills: { slot: number; chance: number; gains: { attribute: string; from: number; to: number }[] }[];
+    }[];
+  };
 }
-
 export interface TimelineData {
   world: { id: string; name: string; status: string };
   season: {
@@ -463,6 +497,7 @@ export interface PlayerQualityProgressItem {
 }
 
 export interface PlayerSkillsData {
+  growth_season?: number;
   left_column: PlayerSkillItem[];
   right_column: PlayerSkillItem[];
   key_attributes?: PlayerSkillItem[];

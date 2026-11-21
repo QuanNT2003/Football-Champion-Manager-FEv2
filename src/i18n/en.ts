@@ -1,6 +1,11 @@
 import { Translations } from './types';
+import { trainingEn } from './training';
 
 export const en: Translations = {
+  ...trainingEn,
+  "skills.season_growth_value": "Attribute change this season: {growth}",
+  "skills.season_growth_legend": "Attribute changes in season {season}",
+  "skills.season_growth_current": "Attribute changes this season",
   "academy.nav": "Youth academy",
   "academy.eyebrow": "Talent development",
   "academy.title": "Youth football academy",
