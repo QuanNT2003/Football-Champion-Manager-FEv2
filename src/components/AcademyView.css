@@ -1,0 +1,57 @@
+.academy-page { --academy-bg: var(--game-surface, #141d18); --academy-ink: var(--game-ink, #eff7f1); --academy-muted: var(--game-muted, #a1b2a7); --academy-line: var(--game-line, #2a392f); --academy-accent: var(--game-accent, #beff55); color: var(--academy-ink); display: grid; gap: 22px; padding: 24px; }
+.academy-header, .academy-section-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+.academy-header h2 { font-size: clamp(24px, 3vw, 34px); margin: 8px 0; line-height: 1.15; }
+.academy-header p, .academy-section-heading p { margin: 0; color: var(--academy-muted); font-size: 13px; line-height: 1.6; }
+.academy-eyebrow { display: inline-flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: .14em; color: var(--academy-accent); font-size: 11px; font-weight: 700; }
+.academy-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border-radius: 8px; border: 1px solid var(--academy-line); background: var(--academy-bg); color: var(--academy-ink); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; flex-shrink: 0; }
+.academy-button:hover:not(:disabled) { border-color: var(--academy-accent); filter: brightness(1.08); }
+.academy-button:disabled { opacity: .45; cursor: not-allowed; }
+.academy-primary { background: var(--academy-accent); border-color: var(--academy-accent); color: #10200e; }
+.academy-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; border: 1px solid var(--academy-line); border-radius: 12px; overflow: hidden; background: var(--academy-line); }
+.academy-stats > div { background: var(--academy-bg); padding: 20px; display: grid; gap: 12px; }
+.academy-stats > div > span { font-size: 12px; color: var(--academy-muted); }
+.academy-stats strong { font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.academy-stats small { color: var(--academy-muted); font-size: 12px; font-weight: 400; }
+.academy-window { display: flex; align-items: center; gap: 9px; color: var(--academy-muted); font-size: 13px; }
+.academy-window.is-open { color: var(--game-success, #90dfae); }
+.academy-window small { margin-left: auto; color: var(--academy-muted); }
+.academy-season-note { margin: -10px 0 0; font-size: 12px; color: var(--academy-muted); line-height: 1.75; max-width: 950px; }
+.academy-section-heading h3 { display: flex; align-items: center; gap: 9px; font-size: 18px; margin: 0 0 5px; }
+.academy-section-heading > span { font-size: 12px; color: var(--academy-muted); }
+.academy-recruitment, .academy-roster { background: var(--academy-bg); padding: 20px; border: 1px solid var(--academy-line); border-radius: 12px; min-width: 0; }
+.academy-recruitment { border-color: var(--game-green-line, #426844); }
+.academy-candidate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; margin-top: 20px; }
+.academy-candidate { border: 1px solid var(--academy-line); border-radius: 10px; padding: 18px; background: var(--game-raised, #1b2720); }
+.academy-candidate.is-elite { border-color: var(--game-gold-line, #69502b); }
+.academy-candidate-person { display: flex; align-items: center; gap: 12px; }
+.academy-candidate h4 { margin: 0 0 5px; font-size: 15px; }
+.academy-candidate-person p { margin: 0; color: var(--academy-muted); font-size: 11px; line-height: 1.6; }
+.academy-portrait { flex-shrink: 0; display: inline-grid; place-items: center; overflow: hidden; width: 46px; height: 50px; border-radius: 8px; background: var(--game-accent-soft, #253924); color: var(--academy-accent); font-weight: 700; }
+.academy-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.academy-ratings { display: flex; align-items: center; gap: 28px; margin: 22px 0 12px; }
+.academy-ratings > div { display: grid; gap: 4px; }
+.academy-ratings > div > span { color: var(--academy-muted); font-size: 10px; text-transform: uppercase; }
+.academy-ratings strong { font-size: 28px; font-variant-numeric: tabular-nums; }
+.academy-talent { margin-left: auto; padding: 5px 8px; border-radius: 5px; color: var(--game-gold, #f1c875); background: var(--game-gold-soft, #342a19); font-size: 10px; }
+.academy-terms { color: var(--academy-muted); font-size: 11px; line-height: 1.7; margin: 0 0 15px; }
+.academy-candidate > .academy-button { width: 100%; }
+.academy-table-wrap { overflow-x: auto; margin-top: 16px; }
+.academy-roster table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; white-space: nowrap; }
+.academy-roster th { color: var(--academy-muted); font-size: 11px; font-weight: 500; padding: 12px; border-bottom: 1px solid var(--academy-line); }
+.academy-roster td { padding: 10px 12px; border-bottom: 1px solid var(--academy-line); }
+.academy-roster tr:last-child td { border-bottom: 0; }
+.academy-player-link { display: flex; align-items: center; gap: 12px; background: none; color: inherit; font: inherit; padding: 0; border: 0; cursor: pointer; text-align: left; }
+.academy-player-link:hover { color: var(--academy-accent); }
+.academy-player-link > span { display: grid; gap: 5px; }
+.academy-player-link small { color: var(--academy-muted); font-size: 11px; }
+.academy-position { padding: 4px 8px; background: var(--game-accent-soft, #253924); color: var(--academy-accent); border-radius: 4px; font-size: 11px; }
+.academy-elite-value { color: var(--game-gold, #f1c875); }
+.academy-empty { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 130px; padding: 24px; text-align: center; color: var(--academy-muted); font-size: 13px; }
+.academy-message { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+.academy-message > svg { flex-shrink: 0; }
+.academy-error { color: var(--game-danger, #ff9ea9); background: var(--game-danger-soft, #392229); }
+.academy-success { color: var(--game-success, #90dfae); background: var(--game-accent-soft, #253924); }
+.academy-spin { animation: academy-spin 1s linear infinite; }
+@keyframes academy-spin { to { transform: rotate(360deg); } }
+@media (max-width: 700px) { .academy-page { padding: 15px; gap: 18px; } .academy-header { align-items: stretch; flex-direction: column; } .academy-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .academy-stats > div { padding: 16px; } .academy-stats > div:last-child { grid-column: 1 / -1; } .academy-recruitment, .academy-roster { padding: 15px; } .academy-window { flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .academy-spin { animation: none; } }

@@ -13,6 +13,7 @@ import { DashboardView } from './components/DashboardView';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from './i18n';
 
+const AcademyView = lazy(() => import('./components/AcademyView').then(module => ({ default: module.AcademyView })));
 const SquadView = lazy(() => import('./components/SquadView').then(module => ({ default: module.SquadView })));
 const TacticsView = lazy(() => import('./components/TacticsView').then(module => ({ default: module.TacticsView })));
 const MatchCenterView = lazy(() => import('./components/MatchCenterView').then(module => ({ default: module.MatchCenterView })));
@@ -264,6 +265,10 @@ export function App() {
               onRefreshSquad={() => club && loadClubSquad(club.id)}
             />
           }
+        />
+        <Route
+          path="/academy"
+          element={club && <AcademyView key={`${club.id}:${timeline?.season?.id ?? ''}`} clubId={club.id} seasonId={timeline?.season?.id} onSelectPlayer={setSelectedPlayer} onSquadChanged={refreshClubData} />}
         />
         <Route
           path="/staff"

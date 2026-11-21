@@ -1,11 +1,12 @@
 import {
   ArrowLeftRight, BriefcaseBusiness, Building2, ChartNoAxesCombined, ClipboardList,
-  House, Shirt, ShoppingCart, Swords, Trophy, Weight,
+  House, Sprout, Shirt, ShoppingCart, Swords, Trophy, Weight,
 } from 'lucide-react';
 
 export const clubNavigation = [
   { to: '/dashboard', label: 'nav.dock.dashboard', icon: House },
   { to: '/squad', label: 'nav.dock.squad', icon: Shirt },
+  { to: '/academy', label: 'academy.nav', icon: Sprout },
   { to: '/staff', label: 'nav.dock.staff', icon: BriefcaseBusiness },
   { to: '/tactics', label: 'nav.dock.tactics', icon: ClipboardList },
   { to: '/training', label: 'nav.dock.training', icon: Weight },
