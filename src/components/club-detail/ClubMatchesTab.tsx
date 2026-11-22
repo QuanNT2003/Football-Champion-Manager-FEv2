@@ -1,3 +1,4 @@
+import { formatKickoffTime } from '../../utils/matchTime';
 import React, { useState } from 'react';
 import {
   Trophy,
@@ -91,14 +92,14 @@ export const ClubMatchesTab: React.FC<Props> = ({
           <div>
             {filteredMatches.map((m, index) => {
               const previousMatch = filteredMatches[index - 1];
-              const showDayHeader = !previousMatch || previousMatch.season_day !== m.season_day;
+              const showDayHeader = !previousMatch || previousMatch.season_day !== m.season_day || previousMatch.match_date !== m.match_date;
               const isFinished = m.status === 'FINISHED' || m.status === 'COMPLETED';
 
               return (
                 <React.Fragment key={m.id}>
                   {showDayHeader && (
                     <div className="fixture-section-label" style={{ margin: '14px 0 8px' }}>
-                      <span>Day {m.season_day}</span>
+                      <span>Day {m.season_day} · {m.match_date?.slice(0, 10)} (UTC+7)</span>
                     </div>
                   )}
 
@@ -122,7 +123,7 @@ export const ClubMatchesTab: React.FC<Props> = ({
                         </span>
                         <span className="fixture-time-pill">
                           <Clock size={12} />
-                          {m.kickoff_time ? m.kickoff_time.slice(0, 5) : '20:00'}
+                          {formatKickoffTime(m.kickoff_time)}
                         </span>
                       </div>
                     </div>

@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:scheduling": "node --test test/match-time.test.cjs",
+    "test:i18n": "node --test test/tournament-localization.test.cjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

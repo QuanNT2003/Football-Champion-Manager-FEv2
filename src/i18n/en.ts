@@ -2,6 +2,14 @@ import { Translations } from './types';
 import { trainingEn } from './training';
 
 export const en: Translations = {
+  'standings.domestic_comps': 'Domestic Competitions',
+  'standings.continental_comps': 'Continental Club Cups',
+  'standings.international_comps': 'National Team Cups',
+  'federation.league_format': '4 league tiers',
+  'federation.knockout_format': 'Knockout',
+  'federation.super_cup_format': 'Super Cup',
+  'federation.group_knockout_format': 'Group stage and knockout',
+  'federation.youth_format': '32 U21 teams · Group stage and knockout',
   ...trainingEn,
   "skills.season_growth_value": "Attribute change this season: {growth}",
   "skills.season_growth_legend": "Attribute changes in season {season}",
@@ -63,8 +71,8 @@ export const en: Translations = {
   'v2.allStandings': 'View standings',
   'v2.noCompetitions': 'Your club has no active competitions.',
   'v2.dashboardError': 'The club overview could not be loaded.',
-  'v2.continental': 'Continental Competitions',
-  'v2.international': 'International Competitions',
+  'v2.continental': 'Continental Club Cups',
+  'v2.international': 'National Team Cups',
   'v2.managerGame': 'Online football management game',
   'v2.signIn': 'Sign in',
   'v2.signUp': 'Sign up',

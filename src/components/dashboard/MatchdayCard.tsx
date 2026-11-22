@@ -1,3 +1,4 @@
+import { formatKickoffTime } from '../../utils/matchTime';
 import { ArrowRight, ClipboardList, Swords } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../i18n';
@@ -27,7 +28,7 @@ export function MatchdayCard({ club, next, last }: {
   const { comp } = useTournamentLocale();
   const home = next?.home_club ?? (next?.is_home ? club : next?.opponent);
   const away = next?.away_club ?? (next?.is_home ? next?.opponent : club);
-  const kickoff = next?.kickoff_time?.match(/\d{2}:\d{2}/)?.[0] ?? '—';
+  const kickoff = formatKickoffTime(next?.kickoff_time, '—');
 
   return (
     <section className="game-panel game-match-card" aria-labelledby="next-match-title">
@@ -43,7 +44,7 @@ export function MatchdayCard({ club, next, last }: {
             <div className="game-kickoff">
               <span>VS</span>
               <strong>{kickoff}</strong>
-              <small>{t('common.day')} {next.season_day}</small>
+              <small>{t('common.day')} {next.season_day} · UTC+7</small>
             </div>
             <MatchTeam team={away} venue={t('common.away')} />
           </div>

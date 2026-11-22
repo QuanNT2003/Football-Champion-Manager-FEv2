@@ -1,3 +1,4 @@
+import { formatKickoffTime as formatTime } from '../utils/matchTime';
 import { useTranslation } from '../i18n';
 import { useTournamentLocale } from '../utils/tournamentLocalization';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -30,21 +31,6 @@ interface Props {
 }
 
 type StatusFilter = 'ALL' | 'SCHEDULED' | 'FINISHED';
-
-const formatTime = (value?: string) => {
-  if (!value) return '--:--';
-  const date = new Date(value);
-  if (!Number.isNaN(date.getTime())) {
-    return new Intl.DateTimeFormat('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'Asia/Ho_Chi_Minh',
-    }).format(date);
-  }
-
-  return value.slice(0, 5);
-};
 
 const ClubBadge: React.FC<{
   name?: string;
@@ -194,7 +180,8 @@ export const MatchCenterView: React.FC<Props> = ({
 
   const sortedMatches = useMemo(() => {
     return [...filteredMatches].sort((a, b) => {
-      if (a.season_day !== b.season_day) return a.season_day - b.season_day;
+      const dateOrder = (a.match_date || '').slice(0, 10).localeCompare((b.match_date || '').slice(0, 10));
+      if (dateOrder) return dateOrder;
       return formatTime(a.kickoff_time).localeCompare(formatTime(b.kickoff_time));
     });
   }, [filteredMatches]);
@@ -293,7 +280,7 @@ export const MatchCenterView: React.FC<Props> = ({
             <div className="season-fixture-table" role="list">
               {sortedMatches.map((match, index) => {
                 const previousMatch = sortedMatches[index - 1];
-                const showDayHeader = !previousMatch || previousMatch.season_day !== match.season_day;
+                const showDayHeader = !previousMatch || previousMatch.season_day !== match.season_day || previousMatch.match_date !== match.match_date;
                 const isSelected = selectedMatch?.id === match.id;
                 const isMyClub = match.homeClub?.id === club?.id || match.awayClub?.id === club?.id;
                 const competitionName = comp(match.competitionSeason?.name || match.stage?.name) || t('matches.comp_fallback', 'Giải đấu');
@@ -303,7 +290,7 @@ export const MatchCenterView: React.FC<Props> = ({
                   <React.Fragment key={match.id}>
                     {showDayHeader && (
                       <div className="fixture-section-label">
-                        <span>Day {match.season_day}</span>
+                        <span>Day {match.season_day} · {match.match_date?.slice(0, 10)} (UTC+7)</span>
                       </div>
                     )}
 

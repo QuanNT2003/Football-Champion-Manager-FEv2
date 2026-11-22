@@ -201,27 +201,59 @@ export function localizeFormatLabel(rawLabel: string | undefined | null, lang: L
 /**
  * Tự động chuẩn hóa và dịch Tên giải đấu (Competition Name).
  */
-export function localizeCompetitionName(rawName: string | undefined | null, lang: Language): string {
+export interface CompetitionNameContext {
+  competition_type?: string;
+  code?: string;
+  confederation_code?: string;
+}
+
+export function localizeCompetitionName(rawName: string | undefined | null, lang: Language, context: CompetitionNameContext = {}): string {
   if (!rawName) return '';
   const trimmed = rawName.trim();
   const isEn = lang === 'en';
 
+  // Resolve cup identities before domestic tier aliases: legacy club-cup names also contain "Tier".
+  const kind = (context.competition_type || context.code || '').toUpperCase();
+  if (kind === 'WORLD_NATIONAL' || kind === 'WORLD_CUP'
+    || /World\s+Cup|Vô\s*Địch\s*Thế\s*Giới.*ĐTQG|^Cúp thế giới$/i.test(trimmed)) {
+    return isEn ? 'FIFA World Cup' : 'Cúp thế giới';
+  }
+  if (kind.startsWith('CONTINENTAL_NATIONAL')
+    || /Cúp.*(?:ĐTQG|đội tuyển quốc gia).*Châu Lục|Continental (?:Nations|National(?: Team)?) Cup/i.test(trimmed)) {
+    return isEn ? 'Continental Nations Cup' : 'Cúp ĐTQG châu lục';
+  }
+  const level = kind.match(/^CONTINENTAL_CLUB_C([123])$/)?.[1]
+    || trimmed.match(/\bC([123])\b/i)?.[1]
+    || trimmed.match(/\bCup\s+([123])\b/i)?.[1]
+    || (/Champions\s+League/i.test(trimmed) ? '1' : undefined);
+  if (level) {
+    const confederation = context.confederation_code?.trim()
+      || trimmed.match(/^(AFC|UEFA|AMERICAS|CAF|CONMEBOL|CONCACAF|OFC)\b/i)?.[1]?.toUpperCase()
+      || trimmed.match(/\((AFC|UEFA|AMERICAS|CAF|CONMEBOL|CONCACAF|OFC)\)/i)?.[1]?.toUpperCase();
+    if (!isEn) return confederation ? `Cúp C${level} ${confederation}` : `Cúp C${level} châu lục`;
+    const prefix = confederation || 'Continental';
+    return level === '1' ? `${prefix} Champions League` : `${prefix} Cup ${level}`;
+  }
+  if (/^(?:Cúp Châu Lục|Continental Cup)/i.test(trimmed) || kind.startsWith('CONTINENTAL_CLUB')) {
+    return isEn ? 'Continental Cup' : 'Cúp châu lục';
+  }
+
   // 1. Phân loại theo Hạng đấu Quốc nội (Domestic Tiers 1..5)
   // Ví dụ: "Giải Hạng Nhì (Tier 3)", "National League (Tier 3)", "Vietnam League 3"
   if (/(?:Giải Hạng Nhì|League.*Tier\s*3|National League.*3|Tier\s*3)/i.test(trimmed)) {
-    return isEn ? 'National League (Tier 3)' : 'Giải Hạng Nhì (Tier 3)';
+    return isEn ? 'National League (Tier 3)' : 'Giải hạng nhì';
   }
   if (/(?:Giải Hạng Nhất|League.*Tier\s*2|National League.*2|Tier\s*2)/i.test(trimmed)) {
-    return isEn ? 'National League (Tier 2)' : 'Giải Hạng Nhất (Tier 2)';
+    return isEn ? 'National League (Tier 2)' : 'Giải hạng nhất';
   }
   if (/(?:Giải Hạng Ba|League.*Tier\s*4|National League.*4|Tier\s*4)/i.test(trimmed)) {
-    return isEn ? 'National League (Tier 4)' : 'Giải Hạng Ba (Tier 4)';
+    return isEn ? 'National League (Tier 4)' : 'Giải hạng ba';
   }
   if (/(?:Giải Hạng Tư|League.*Tier\s*5|National League.*5|Tier\s*5)/i.test(trimmed)) {
-    return isEn ? 'National League (Tier 5)' : 'Giải Hạng Tư (Tier 5)';
+    return isEn ? 'National League (Tier 5)' : 'Giải hạng tư';
   }
   if (/(?:Giải VĐQG|National League.*Tier\s*1|Tier\s*1)/i.test(trimmed)) {
-    return isEn ? 'National League (Tier 1)' : 'Giải VĐQG (Tier 1)';
+    return isEn ? 'National League (Tier 1)' : 'Giải VĐQG';
   }
 
   // 2. League 1..4 theo quốc gia (ví dụ "England League 1", "Vietnam League 2")
@@ -230,6 +262,12 @@ export function localizeCompetitionName(rawName: string | undefined | null, lang
     const nation = leagueMatch[1];
     const tier = leagueMatch[2];
     return isEn ? `${nation} League ${tier}` : `Giải VĐQG ${nation} - Hạng ${tier}`;
+  }
+
+  const leagueOverview = trimmed.match(/^(.+?)\s+League$/i);
+  if (leagueOverview) {
+    const nation = localizeSubTitle(leagueOverview[1], lang);
+    return isEn ? `${nation} League` : `Giải VĐQG ${nation}`;
   }
 
   // 3. Super Cup / Siêu Cúp
@@ -254,22 +292,12 @@ export function localizeCompetitionName(rawName: string | undefined | null, lang
 
   // 5. Domestic Cup / Cúp Quốc Gia
   if (/^(?:Cúp Quốc Gia(?:\s*\(National Cup\))?|National Cup(?:\s*\(Knockout\))?)$/i.test(trimmed)) {
-    return isEn ? 'National Cup' : 'Cúp Quốc Gia (National Cup)';
+    return isEn ? 'National Cup' : 'Cúp quốc gia';
   }
   const cupMatch = trimmed.match(/^(.+?)\s+Cup$/i);
   if (cupMatch && !trimmed.toLowerCase().includes('champions') && !trimmed.toLowerCase().includes('world')) {
     const nation = cupMatch[1];
     return isEn ? `${nation} Cup` : `Cúp Quốc Gia ${nation}`;
-  }
-
-  // 6. Continental Cups / Cúp Châu Lục (C1, C2, C3)
-  if (/^(?:Cúp Châu Lục|Continental Cup)/i.test(trimmed)) {
-    return isEn ? 'Continental Cup (Champions League)' : 'Cúp Châu Lục (C1)';
-  }
-  const clMatch = trimmed.match(/^(.+?)\s+Champions\s+League$/i);
-  if (clMatch) {
-    const confed = clMatch[1];
-    return isEn ? `${confed} Champions League` : `Cúp C1 Châu Lục (${confed})`;
   }
 
   return trimmed;
@@ -328,7 +356,7 @@ export function useTournamentLocale() {
     group: (name: string | undefined | null) => localizeGroupName(name, language),
     stage: (name: string | undefined | null) => localizeStageName(name, language),
     format: (label: string | undefined | null) => localizeFormatLabel(label, language),
-    comp: (name: string | undefined | null) => localizeCompetitionName(name, language),
+    comp: (name: string | undefined | null, context?: CompetitionNameContext) => localizeCompetitionName(name, language, context),
     status: (label: string | undefined | null) => localizeStatusLabel(label, language),
     subTitle: (sub: string | undefined | null) => localizeSubTitle(sub, language),
     language,

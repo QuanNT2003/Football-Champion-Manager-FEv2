@@ -26,12 +26,12 @@ export function FederationMenu({ menu, onSelect }: {
     {
       label: t('v2.continental'),
       Icon: Swords,
-      links: (menu?.continental ?? []).map(item => ({ to: `/competitions/continental?id=${item.id}`, name: item.name })),
+      links: (menu?.continental ?? []).map(item => ({ to: `/competitions/continental?id=${item.id}`, name: item.name, context: item })),
     },
     {
       label: t('v2.international'),
       Icon: Globe2,
-      links: (menu?.international ?? []).map(item => ({ to: `/competitions/international?id=${item.id}`, name: item.name })),
+      links: (menu?.international ?? []).map(item => ({ to: `/competitions/international?id=${item.id}`, name: item.name, context: item })),
     },
   ];
 
@@ -40,12 +40,13 @@ export function FederationMenu({ menu, onSelect }: {
       {groups.filter(group => group.links.length).map(({ label, Icon, links }) => (
         <div key={label}>
           <h2><Icon size={16} /> {label}</h2>
-          {links.map(({ to, name }) => {
+          {links.map(link => {
+            const { to, name } = link;
             const active = to === location.pathname + location.search
               || (to === '/competitions/league' && ['/standings', to].includes(location.pathname));
             return (
               <Link key={to} to={to} onClick={onSelect} className={active ? 'is-active' : ''} aria-current={active ? 'page' : undefined}>
-                {comp(name)} <ChevronRight size={14} />
+                {comp(name, 'context' in link ? link.context : undefined)} <ChevronRight size={14} />
               </Link>
             );
           })}
