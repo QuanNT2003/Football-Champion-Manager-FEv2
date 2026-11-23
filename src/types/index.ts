@@ -6,6 +6,13 @@ export interface User {
   roles?: string[];
 }
 
+export interface UpgradeTiming {
+  started_at?: string;
+  completes_at?: string;
+  server_time?: string;
+  remaining_seconds?: number;
+}
+
 export interface Stadium {
   id: string;
   name: string;
@@ -13,6 +20,22 @@ export interface Stadium {
   city?: string;
   country?: string | { id: string; name: string; code?: string; flag_url?: string } | null;
   pitch_type?: string;
+  upgrade_cost?: number;
+  upgrade_days?: number;
+  capacity_increment?: number;
+  next_capacity?: number;
+  completed_expansions?: number;
+  active_upgrade?: {
+    id: string;
+    cost: number;
+    from_capacity: number;
+    to_capacity: number;
+    upgrade_days: number;
+    days_remaining: number;
+    start_season_id: string;
+    start_season_day: number;
+    completion_season_day: number | null;
+  } & UpgradeTiming | null;
 }
 
 export interface Facility {
@@ -21,7 +44,19 @@ export interface Facility {
   code: string;
   current_level: number;
   status: string;
-  upgrade_cost?: number;
+  upgrade_cost?: number | null;
+  max_level?: number;
+  upgrade_days?: number;
+  active_upgrade?: {
+    id: string;
+    target_level: number;
+    cost: number;
+    upgrade_days: number;
+    days_remaining: number;
+    start_season_id: string | null;
+    start_season_day: number;
+    completion_season_day: number | null;
+  } & UpgradeTiming | null;
 }
 
 export interface Club {

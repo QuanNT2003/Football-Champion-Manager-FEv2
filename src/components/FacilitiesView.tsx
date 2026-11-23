@@ -1,188 +1,213 @@
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, Building2, ChartNoAxesCombined, Check, Clock3, Dumbbell, GraduationCap, Hammer, Loader2, MapPin, ShieldCheck, Stethoscope, Store, Users } from 'lucide-react';
+import type { Club, UpgradeTiming } from '../types';
 import { useTranslation } from '../i18n';
-import React from 'react';
-import { Club } from '../types';
-import {
-  Building2,
-  Dumbbell,
-  Stethoscope,
-  Users,
-  GraduationCap,
-  Hammer,
-  ShieldCheck,
-} from 'lucide-react';
+import { facilityImageUrl, normalizeFacilityCode } from '../utils/facilities';
+import './FacilitiesView.css';
+import { ConfirmModal } from './common/ConfirmModal';
 
 interface Props {
   club: Club | null;
   onUpgradeFacility: (facilityId: string) => Promise<void> | void;
+  onUpgradeStadium?: () => Promise<void> | void;
+  onRefresh?: () => Promise<void> | void;
 }
 
-export const FacilitiesView: React.FC<Props> = ({ club, onUpgradeFacility }) => {
-  const { t } = useTranslation();
-  if (!club) {
-    return (
-      <div className="game-empty-state">
-        <Building2 size={48} className="empty-icon" />
-        <h3>{t('common.no_data')}</h3>
-        <p>{t('facilities.no_club_prompt', 'Vui lòng chọn hoặc hoàn tất nhận câu lạc bộ để truy cập cơ sở hạ tầng.')}</p>
-      </div>
-    );
-  }
+const facilityMeta = {
+  TRAINING_GROUND: { icon: Dumbbell, key: 'training', tone: 'green' },
+  YOUTH_ACADEMY: { icon: GraduationCap, key: 'youth', tone: 'teal' },
+  MEDICAL_CENTRE: { icon: Stethoscope, key: 'medical', tone: 'rose' },
+  DATA_ANALYTICS: { icon: ChartNoAxesCombined, key: 'analytics', tone: 'blue' },
+  COMMERCIAL_OFFICE: { icon: Store, key: 'commercial', tone: 'gold' },
+  STADIUM: { icon: Building2, key: 'stadium', tone: 'green' },
+} as const;
 
-  const facilities = club.facilities || [];
-  const stadium = club.stadiums?.[0] || club.stadium;
-  const cash = club.financial_accounts?.[0]?.cash_balance ?? club.finances?.cash ?? 1500000;
+function FacilityImage({ src, fallback, name, eager = false }: { src?: string; fallback?: string; name: string; eager?: boolean }) {
+  const [failedSources, setFailedSources] = useState<string[]>([]);
+  const current = [src, fallback].find(source => source && !failedSources.includes(source));
+  return current
+    ? <img src={current} alt={name} loading={eager ? 'eager' : 'lazy'} onError={() => setFailedSources(previous => [...previous, current])} />
+    : <div className="infrastructure-image-fallback" role="img" aria-label={name}><Building2 size={52} strokeWidth={1} /></div>;
+}
 
-  const getFacilityIcon = (code: string) => {
-    switch (code?.toUpperCase()) {
-      case 'TRAINING_GROUND':
-      case 'TRAINING':
-        return <Dumbbell size={24} className="facility-type-icon text-cyan" />;
-      case 'YOUTH_ACADEMY':
-      case 'YOUTH':
-        return <GraduationCap size={24} className="facility-type-icon text-emerald" />;
-      case 'MEDICAL_CENTER':
-      case 'MEDICAL':
-        return <Stethoscope size={24} className="facility-type-icon text-rose" />;
-      case 'SCOUTING_NETWORK':
-      case 'SCOUTING':
-        return <Users size={24} className="facility-type-icon text-amber" />;
-      default:
-        return <Building2 size={24} className="facility-type-icon text-purple" />;
-    }
+export function FacilitiesView({ club, onUpgradeFacility, onUpgradeStadium, onRefresh }: Props) {
+  const { t, language } = useTranslation();
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const upgradeLock = useRef(false);
+  const [error, setError] = useState('');
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const facilities = club?.facilities ?? club?.club_facilities ?? [];
+  const stadium = club?.stadium ?? club?.stadiums?.[0];
+  const activeStadium = stadium?.active_upgrade;
+  const activeFacility = facilities.find(f => f.active_upgrade || ['UPGRADING', 'UNDER_CONSTRUCTION'].includes(f.status));
+  const hasActiveUpgrade = Boolean(activeFacility || activeStadium);
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    if (!hasActiveUpgrade) return;
+    const timer = window.setInterval(() => setClock(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [hasActiveUpgrade]);
+  useEffect(() => {
+    if (!hasActiveUpgrade || !onRefresh) return;
+    const refresh = () => { if (document.visibilityState === 'visible') void onRefresh(); };
+    const timer = window.setInterval(refresh, 60000);
+    window.addEventListener('focus', refresh);
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', refresh); };
+  }, [club?.id, hasActiveUpgrade, onRefresh]);
+
+  if (!club) return <div className="game-empty-state">
+    <Building2 size={48} className="empty-icon" /><h3>{t('common.no_data')}</h3><p>{t('facilities.no_club_prompt')}</p>
+  </div>;
+
+  const stadiumFacility = facilities.find(f => normalizeFacilityCode(f.code) === 'STADIUM');
+  const stadiumImage = facilityImageUrl('STADIUM', stadium?.completed_expansions != null ? stadium.completed_expansions + 1 : stadiumFacility?.current_level ?? 1);
+  const cash = club.financial_accounts?.[0]?.cash_balance ?? club.finances?.cash;
+  const locale = language === 'vi' ? 'vi-VN' : 'en-GB';
+  const number = (value: number) => Number(value).toLocaleString(locale);
+  const money = (value: number) => new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+  const remainingTime = (upgrade: UpgradeTiming & { days_remaining: number }) => {
+    const deadline = upgrade.completes_at ? Date.parse(upgrade.completes_at) : NaN;
+    const seconds = Number.isFinite(deadline) ? Math.max(0, Math.ceil((deadline - clock) / 1000)) : upgrade.remaining_seconds ?? upgrade.days_remaining * 86400;
+    if (seconds === 0) return t('facilities.finalizing');
+    const time = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60].map(value => String(value).padStart(2, '0')).join(':');
+    return t('facilities.remaining_time', { time });
+  };
+  const completionTime = (upgrade: UpgradeTiming) => upgrade.completes_at
+    ? t('facilities.completes_at', { time: new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date(upgrade.completes_at)) }) : '';
+  const totalFacilities = facilities.length + (stadium ? 1 : 0);
+  const operational = facilities.filter(f => !f.status || ['OPERATIONAL', 'ACTIVE'].includes(f.status)).length + (stadium && !activeStadium ? 1 : 0);
+  const stadiumName = stadium?.name || `${club.name} Arena`;
+  const location = [stadium?.city || club.city, club.country_detail?.name || club.country].filter(Boolean).join(', ');
+  const facilityName = (facility: typeof facilities[number]) => {
+    const meta = facilityMeta[normalizeFacilityCode(facility.code) as keyof typeof facilityMeta];
+    return meta ? t(`facilities.type_${meta.key}`) : facility.name;
+  };
+  const confirming = facilities.find(f => f.id === confirmId);
+  const stadiumCost = stadium?.upgrade_cost;
+  const stadiumInsufficientCash = cash != null && stadiumCost != null && Number(cash) < stadiumCost;
+
+  const upgrade = async (id: string) => {
+    if (upgradeLock.current || hasActiveUpgrade) return;
+    upgradeLock.current = true;
+    setPendingId(id);
+    setError('');
+    try { if (id === 'stadium') await onUpgradeStadium?.(); else await onUpgradeFacility(id); }
+    catch (err) { setError((err as { response?: { data?: { message?: string } } })?.response?.data?.message || t('app.upgrade_failed')); }
+    finally { upgradeLock.current = false; setPendingId(null); setConfirmId(null); }
   };
 
-  const getFacilityDescription = (code: string) => {
-    switch (code?.toUpperCase()) {
-      case 'TRAINING_GROUND':
-      case 'TRAINING':
-        return t('facilities.desc_training', 'Tăng hiệu quả phát triển chỉ số thuộc tính cầu thủ trong các buổi tập chuyên sâu.');
-      case 'YOUTH_ACADEMY':
-      case 'YOUTH':
-        return t('facilities.desc_youth', 'Sản sinh các tài năng trẻ U19 tiềm năng cao (Wonderkids) mỗi đầu mùa giải.');
-      case 'MEDICAL_CENTER':
-      case 'MEDICAL':
-        return t('facilities.desc_medical', 'Giảm 50% thời gian điều trị chấn thương và tăng tốc độ hồi phục thể lực thi đấu.');
-      case 'SCOUTING_NETWORK':
-      case 'SCOUTING':
-        return t('facilities.desc_scouting', 'Mở rộng tầm quét trinh sát toàn cầu, báo cáo chính xác tiềm năng cầu thủ đối thủ.');
-      default:
-        return t('facilities.desc_stadium', 'Nâng cao danh tiếng quốc tế và quy mô hạ tầng chuyên nghiệp của câu lạc bộ.');
-    }
-  };
-
-  return (
-    <div className="view-container facilities-page">
-      {/* Stadium Landmark Hero Banner */}
-      <div className="stadium-hero-card">
-        <div className="stadium-hero-content">
-          <div className="hero-badge">
-            <ShieldCheck size={16} />
-            <span>{t('facilities.stadium')}</span>
-          </div>
-          <h2 className="stadium-name">{stadium?.name || `${club.name} Arena`}</h2>
-          <p className="stadium-city">
-            {club.city || t('facilities.city_default', 'Thành Phố')}, {club.country || t('facilities.country_default', 'Quốc Gia')} • {t('facilities.pitch_standard', 'Mặt cỏ tự nhiên chuẩn FIFA Pro')}
-          </p>
-
-          <div className="stadium-stats-row">
-            <div className="stadium-stat-item">
-              <span className="stat-label">{t('facilities.capacity')}</span>
-              <strong className="stat-value text-cyan">
-                {(stadium?.capacity || 25000).toLocaleString()} <small>{t('facilities.seats')}</small>
-              </strong>
-            </div>
-
-            <div className="stadium-stat-item">
-              <span className="stat-label">{t('finances.cash_balance')}</span>
-              <strong className="stat-value text-emerald">
-                €{Number(cash).toLocaleString()} <small>CASH</small>
-              </strong>
-            </div>
-
-            <div className="stadium-stat-item">
-              <span className="stat-label">{t('facilities.arch_class', 'ĐẲNG CẤP KIẾN TRÚC')}</span>
-              <strong className="stat-value text-amber">
-                {t('facilities.world_class', 'HẠNG ĐẲNG CẤP THẾ GIỚI')}
-              </strong>
-            </div>
-          </div>
-        </div>
-
-        <div className="stadium-visual-badge">
-          <div className="stadium-3d-glow" />
-          <span className="stadium-emoji">🏟️</span>
-        </div>
+  return <div className="view-container infrastructure-page">
+    <section className="infrastructure-hero" aria-labelledby="infrastructure-stadium-name">
+      <div className="infrastructure-hero-image"><FacilityImage key={stadiumImage} src={stadiumImage} fallback={club.stadium?.image_url ?? undefined} name={stadiumName} eager /></div>
+      <div className="infrastructure-hero-content">
+        <span className="infrastructure-eyebrow"><ShieldCheck size={15} />{t('facilities.stadium')}</span>
+        <h2 id="infrastructure-stadium-name">{stadiumName}</h2>
+        {location && <p className="infrastructure-location"><MapPin size={14} />{location}</p>}
+        <p className="infrastructure-hero-description">{t('facilities.stadium_desc')}</p>
+        <div className="infrastructure-capacity"><Users size={21} /><div>
+          <span>{t('facilities.capacity')}</span>
+          <strong>{stadium?.capacity != null ? number(stadium.capacity) : '—'} <small>{t('facilities.seats')}</small></strong>
+        </div></div>
+        {stadium && <div className="infrastructure-stadium-expansion">
+          <div><span>{activeStadium ? t('facilities.paid_cost') : t('facilities.upgrade_cost')}</span>
+            <strong>{activeStadium ? money(activeStadium.cost) : stadiumCost != null ? money(stadiumCost) : t('facilities.price_unavailable')}</strong></div>
+          <div><span>{activeStadium ? remainingTime(activeStadium) : t('facilities.duration_hours', { hours: 48 })}</span>
+            <strong>{t('facilities.stadium_add_seats', { count: number(stadium.capacity_increment ?? 5000) })}</strong></div>
+          <button type="button" className="infrastructure-upgrade" disabled={!onUpgradeStadium || hasActiveUpgrade || pendingId !== null || stadiumCost == null || stadiumInsufficientCash}
+            title={hasActiveUpgrade ? t('facilities.queue_locked') : stadiumInsufficientCash ? t('facilities.not_enough_cash') : undefined}
+            onClick={() => { setError(''); setConfirmId('stadium'); }}>
+            <Hammer size={16} />{activeStadium ? t('facilities.construction') : hasActiveUpgrade ? t('facilities.wait_construction') : t('facilities.expand_stadium')}
+          </button>
+          <p>{t('facilities.stadium_capacity_change', { from: number(stadium.capacity), to: number(activeStadium?.to_capacity ?? stadium.next_capacity ?? stadium.capacity + 5000) })}</p>
+          {activeStadium?.completes_at && <p>{completionTime(activeStadium)}</p>}
+        </div>}
       </div>
+      <span className="infrastructure-hero-caption">{club.name}</span>
+    </section>
 
-      {/* Facilities Grid */}
-      <div className="section-heading-row">
-        <div>
-          <h3 className="section-title">{t('facilities.title')}</h3>
-          <p className="section-subtitle">
-            {t('facilities.subtitle')}
-          </p>
-        </div>
-      </div>
-
-      <div className="facilities-grid">
-        {facilities.map((f) => {
-          const maxLevel = 10;
-          const currentLvl = f.current_level || 1;
-          const progressPercent = Math.min(100, Math.round((currentLvl / maxLevel) * 100));
-
-          return (
-            <div key={f.id} className="facility-card-hud">
-              <div className="facility-card-header">
-                <div className="facility-icon-wrap">
-                  {getFacilityIcon(f.code)}
-                </div>
-                <div className="facility-title-box">
-                  <h4>{f.name}</h4>
-                  <div className="facility-code-pill">{f.code || 'INFRA'}</div>
-                </div>
-                <div className="facility-level-pill">
-                  <span>{t('common.level')}</span>
-                  <strong>{currentLvl}/{maxLevel}</strong>
-                </div>
-              </div>
-
-              <p className="facility-desc">{getFacilityDescription(f.code)}</p>
-
-              {/* Progress Bar */}
-              <div className="facility-progress-section">
-                <div className="progress-labels">
-                  <span>{t('training.history_title')}</span>
-                  <strong>{progressPercent}%</strong>
-                </div>
-                <div className="hud-progress-track">
-                  <div
-                    className="hud-progress-bar"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Action Footer */}
-              <div className="facility-card-footer">
-                <div className="facility-status-tag">
-                  <span className="status-dot-pulse" />
-                  <span>{f.status || t('facilities.status_operating', 'HOẠT ĐỘNG TỐT')}</span>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-upgrade-hud"
-                  onClick={() => onUpgradeFacility(f.id)}
-                  disabled={currentLvl >= maxLevel}
-                >
-                  <Hammer size={16} />
-                  <span>{currentLvl >= maxLevel ? t('facilities.max_level') : t('facilities.upgrade_btn')}</span>
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+    <div className="infrastructure-overview">
+      <div><span>{t('finances.cash_balance')}</span><strong className="infrastructure-cash">{cash != null ? money(cash) : '—'}</strong></div>
+      <div><span>{t('facilities.total')}</span><strong>{number(totalFacilities)} <small>{t('facilities.items')}</small></strong></div>
+      <div><span>{t('facilities.status_operating')}</span><strong><i />{operational}<small> / {totalFacilities}</small></strong></div>
     </div>
-  );
-};
+
+    <header className="infrastructure-heading"><div>
+      <span className="infrastructure-eyebrow">{t('facilities.development')}</span>
+      <h3>{t('facilities.title')}</h3><p>{t('facilities.subtitle')}</p>
+    </div><span className="infrastructure-count"><Building2 size={15} />{facilities.length} {t('facilities.items')}</span></header>
+    <p className="infrastructure-construction-rule"><Clock3 size={15} />{t('facilities.construction_rule')}</p>
+    {(activeFacility || activeStadium) && <div className="infrastructure-construction-banner" role="status"><Hammer size={22} /><div>
+      <strong>{t('facilities.active_construction', { name: activeStadium ? t('facilities.type_stadium') : facilityName(activeFacility!) })}</strong>
+      <p>{activeStadium || activeFacility?.active_upgrade ? remainingTime(activeStadium || activeFacility!.active_upgrade!) : t('facilities.upgrading')} · {t('facilities.queue_locked')}</p>
+    </div></div>}
+    {error && <p className="infrastructure-error" role="alert">{error}</p>}
+    {!facilities.length ? <div className="infrastructure-empty"><Building2 size={36} strokeWidth={1.2} /><h4>{t('facilities.empty_title')}</h4><p>{t('facilities.empty_description')}</p></div>
+      : <div className="infrastructure-grid">{facilities.map(facility => {
+        const code = normalizeFacilityCode(facility.code);
+        const meta = facilityMeta[code as keyof typeof facilityMeta];
+        const Icon = meta?.icon ?? Building2;
+        const name = facilityName(facility);
+        const maxLevel = facility.max_level ?? 10;
+        const level = Math.max(1, Number(facility.current_level) || 1);
+        const maxed = level >= maxLevel;
+        const isUpgrading = Boolean(facility.active_upgrade) || ['UPGRADING', 'UNDER_CONSTRUCTION'].includes(facility.status);
+        const blocked = hasActiveUpgrade && !isUpgrading;
+        const busy = pendingId === facility.id;
+        const insufficientCash = facility.upgrade_cost != null && cash != null && Number(cash) < Number(facility.upgrade_cost);
+        const image = facilityImageUrl(code, level);
+        const status = isUpgrading ? t('facilities.upgrading')
+          : !facility.status || ['OPERATIONAL', 'ACTIVE'].includes(facility.status) ? t('facilities.status_operating')
+          : t(`facilities.status_${facility.status.toLowerCase()}`, t('facilities.status_unavailable'));
+
+        return <article className={`infrastructure-card tone-${meta?.tone ?? 'green'}`} key={facility.id} aria-labelledby={`facility-${facility.id}`}>
+          <div className="infrastructure-card-image">
+            <FacilityImage key={image} src={image} name={t('facilities.image_alt', { name, level })} />
+            <span className="infrastructure-level">{t('common.level')} <strong>{level.toString().padStart(2, '0')}</strong><small>/ {maxLevel}</small></span>
+            <span className={`infrastructure-status ${isUpgrading ? 'is-upgrading' : ''}`}><i />{status}</span>
+          </div>
+          <div className="infrastructure-card-body">
+            <header><span className="infrastructure-card-icon"><Icon size={21} strokeWidth={1.7} /></span><h4 id={`facility-${facility.id}`}>{name}</h4></header>
+            <p>{meta ? t(`facilities.card_desc_${meta.key}`) : t('facilities.card_desc_generic')}</p>
+            <div className="infrastructure-duration"><Clock3 size={13} />{isUpgrading && facility.active_upgrade
+              ? remainingTime(facility.active_upgrade)
+              : t('facilities.duration_hours', { hours: 48 })}
+              {facility.active_upgrade && <strong>→ {t('common.level')} {facility.active_upgrade.target_level}</strong>}</div>
+            {facility.active_upgrade?.completes_at && <p className="infrastructure-completion-time">{completionTime(facility.active_upgrade)}</p>}
+            <div className="infrastructure-progress-label"><span>{t('facilities.development_level')}</span><strong>{level}<small> / {maxLevel}</small></strong></div>
+            <div className="infrastructure-progress" role="progressbar" aria-label={t('facilities.development_level')} aria-valuemin={0} aria-valuemax={maxLevel} aria-valuenow={Math.min(level, maxLevel)}>
+              {Array.from({ length: maxLevel }, (_, index) => <span key={index} className={index < level ? 'is-filled' : ''} />)}
+            </div>
+          </div>
+          <footer className="infrastructure-card-footer">
+            <span className="infrastructure-next-level">{maxed ? <><Check size={15} />{t('facilities.max_level')}</>
+              : facility.active_upgrade ? <><span>{t('facilities.paid_cost')}</span><strong>{money(facility.active_upgrade.cost)}</strong></>
+              : facility.upgrade_cost != null ? <><span>{t('facilities.upgrade_cost')}</span><strong>{money(facility.upgrade_cost)}</strong></>
+              : <><span>{t('facilities.upgrade_cost')}</span><strong>{t('facilities.price_unavailable')}</strong></>}
+            </span>
+            <button type="button" className="infrastructure-upgrade" disabled={maxed || isUpgrading || blocked || pendingId !== null || insufficientCash || facility.upgrade_cost == null}
+              aria-label={t('facilities.upgrade_named', { name })} aria-busy={busy}
+              title={blocked ? t('facilities.queue_locked') : insufficientCash ? t('facilities.not_enough_cash') : undefined} onClick={() => { setError(''); setConfirmId(facility.id); }}>
+              {busy ? <Loader2 size={16} className="infrastructure-spin" /> : maxed ? <Check size={16} /> : <Hammer size={16} />}
+              {busy ? t('facilities.processing') : maxed ? t('facilities.completed') : isUpgrading ? t('facilities.construction') : blocked ? t('facilities.wait_construction') : t('facilities.upgrade_short')}
+              {!maxed && !busy && !isUpgrading && <ArrowUpRight size={15} />}
+            </button>
+          </footer>
+        </article>;
+      })}</div>}
+    <ConfirmModal isOpen={confirmId === 'stadium' && Boolean(stadium)} title={t('facilities.expand_stadium')} confirmText={t('facilities.start_construction')}
+      isLoading={pendingId !== null} icon={<Hammer size={24} />} onClose={() => setConfirmId(null)}
+      onConfirm={() => { if (stadiumCost != null && onUpgradeStadium && !hasActiveUpgrade) void upgrade('stadium'); }}
+      message={stadium && <div className="infrastructure-confirm"><strong>{stadiumName}</strong>
+        <p>{t('facilities.stadium_capacity_change', { from: number(stadium.capacity), to: number(stadium.next_capacity ?? stadium.capacity + 5000) })}</p>
+        <p>{t('facilities.upgrade_cost')}: <b>{stadiumCost != null ? money(stadiumCost) : '—'}</b></p>
+        <p>{t('facilities.duration_hours', { hours: 48 })}</p><p>{t('facilities.stadium_confirm_charge')}</p>
+      </div>} />
+    <ConfirmModal isOpen={Boolean(confirming)} title={t('facilities.confirm_title')} confirmText={t('facilities.start_construction')}
+      isLoading={pendingId !== null} icon={<Hammer size={24} />} onClose={() => setConfirmId(null)}
+      onConfirm={() => { if (confirming && !hasActiveUpgrade && confirming.upgrade_cost != null) void upgrade(confirming.id); }}
+      message={confirming && <div className="infrastructure-confirm"><strong>{facilityName(confirming)} · {t('common.level')} {confirming.current_level + 1}</strong>
+        <p>{t('facilities.upgrade_cost')}: <b>{confirming.upgrade_cost != null ? money(confirming.upgrade_cost) : '—'}</b></p>
+        <p>{t('facilities.duration_hours', { hours: 48 })}</p><p>{t('facilities.confirm_charge')}</p>
+      </div>} />
+  </div>;
+}

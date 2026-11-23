@@ -137,14 +137,18 @@ export function App() {
 
   const handleUpgradeFacility = async (facilityId: string) => {
     if (!club) return;
-    try {
-      await clubsApi.upgradeFacility(club.id, facilityId);
-      setGlobalNotification(t('app.upgrade_success', 'Cơ sở vật chất đã bắt đầu nâng cấp thành công!'));
-      refreshClubData();
-      setTimeout(() => setGlobalNotification(null), 3500);
-    } catch (err: any) {
-      alert(err.response?.data?.message || t('app.upgrade_failed', 'Nâng cấp thất bại, kiểm tra số dư'));
-    }
+    await clubsApi.upgradeFacility(club.id, facilityId);
+    setGlobalNotification(t('app.upgrade_success', 'Cơ sở vật chất đã bắt đầu nâng cấp thành công!'));
+    await refreshClubData();
+    setTimeout(() => setGlobalNotification(null), 3500);
+  };
+
+  const handleUpgradeStadium = async () => {
+    if (!club) return;
+    await clubsApi.upgradeStadium(club.id);
+    setGlobalNotification(t('facilities.stadium_started'));
+    await refreshClubData();
+    setTimeout(() => setGlobalNotification(null), 3500);
   };
 
   const handleUpdateTransferListing = async (
@@ -326,6 +330,8 @@ export function App() {
           element={
             <FacilitiesView
               onUpgradeFacility={handleUpgradeFacility}
+              onUpgradeStadium={handleUpgradeStadium}
+              onRefresh={refreshClubData}
               club={club}
             />
           }

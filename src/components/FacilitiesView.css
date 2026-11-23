@@ -1,0 +1,103 @@
+.infrastructure-page { display: grid; gap: 24px; min-width: 0; color: var(--game-ink); }
+.infrastructure-hero { position: relative; isolation: isolate; overflow: hidden; min-height: 300px; border: 1px solid var(--game-line-strong); border-radius: 10px; background: var(--game-surface); }
+.infrastructure-hero-image { position: absolute; inset: 0; z-index: -2; }
+.infrastructure-hero-image img { width: 100%; height: 100%; object-fit: cover; object-position: center 53%; }
+.infrastructure-hero::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(8 17 12 / 96%), rgb(8 17 12 / 80%) 32%, rgb(8 17 12 / 12%) 75%), linear-gradient(0deg, rgb(8 17 12 / 55%), transparent 60%); }
+.infrastructure-hero-content { max-width: 580px; padding: 30px; }
+.infrastructure-stadium-expansion { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgb(255 255 255 / 20%); }
+.infrastructure-stadium-expansion > div { display: grid; gap: 6px; }
+.infrastructure-stadium-expansion > div > span { font-size: 10px; color: #d1dfd5; }
+.infrastructure-stadium-expansion strong { color: var(--game-accent); font-size: 15px; }
+.infrastructure-stadium-expansion > p { width: 100%; font-size: 11px; line-height: 1.7; color: #eff7f1; }
+.infrastructure-stadium-expansion .infrastructure-upgrade { min-height: 40px; background: var(--game-accent); color: var(--game-on-accent); }
+.infrastructure-stadium-expansion .infrastructure-upgrade:hover:not(:disabled) { background: var(--game-accent-hover); }
+.infrastructure-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; color: var(--game-accent); }
+.infrastructure-hero h2 { margin: 12px 0 8px; font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); font-weight: 750; line-height: 1.05; overflow-wrap: anywhere; }
+.infrastructure-location { display: flex; align-items: center; gap: 6px; color: #d1dfd5; font-size: 12px; }
+.infrastructure-location svg { flex-shrink: 0; }
+.infrastructure-hero-description { max-width: 350px; margin: 16px 0 23px; font-size: 12px; line-height: 1.7; color: #c5d0c8; }
+.infrastructure-capacity { display: flex; align-items: center; gap: 12px; color: var(--game-accent); }
+.infrastructure-capacity div { display: grid; gap: 3px; }
+.infrastructure-capacity span { font-size: 10px; color: #c5d0c8; }
+.infrastructure-capacity strong { font-family: var(--font-display); font-size: 29px; line-height: 1; }
+.infrastructure-capacity small { font-family: var(--font-body); font-size: 11px; font-weight: 400; color: #c5d0c8; }
+.infrastructure-hero-caption { position: absolute; right: 20px; bottom: 20px; max-width: 35%; border: 1px solid rgb(255 255 255 / 25%); padding: 6px 10px; color: #fff; background: rgb(8 17 12 / 60%); border-radius: 4px; font-size: 10px; text-align: right; }
+.infrastructure-overview { display: grid; grid-template-columns: 1.3fr 1fr 1fr; border: 1px solid var(--game-line); border-radius: 8px; background: var(--game-surface); }
+.infrastructure-overview > div { display: grid; align-content: start; gap: 10px; padding: 18px 22px; min-width: 0; }
+.infrastructure-overview > div + div { border-left: 1px solid var(--game-line); }
+.infrastructure-overview > div > span { font-size: 11px; color: var(--game-muted); }
+.infrastructure-overview strong { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: clamp(18px, 2.2vw, 25px); font-variant-numeric: tabular-nums; line-height: 1.2; overflow-wrap: anywhere; }
+.infrastructure-overview small { color: var(--game-muted); font-size: 11px; font-weight: 400; }
+.infrastructure-overview .infrastructure-cash { color: var(--game-accent); }
+.infrastructure-overview i, .infrastructure-status i { display: inline-block; flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--game-success); }
+.infrastructure-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 5px; }
+.infrastructure-heading h3 { font-family: var(--font-display); font-size: 27px; font-weight: 700; line-height: 1.2; margin: 6px 0; }
+.infrastructure-heading p { color: var(--game-muted); font-size: 12px; line-height: 1.7; max-width: 660px; }
+.infrastructure-count { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; color: var(--game-muted); border: 1px solid var(--game-line); padding: 8px 10px; border-radius: 5px; font-size: 11px; }
+.infrastructure-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); align-items: stretch; gap: 18px; }
+.infrastructure-card { --facility-tone: var(--game-accent); display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--game-line); background: var(--game-surface); border-radius: 9px; transition: border-color .2s; }
+.infrastructure-card:hover { border-color: var(--game-line-active); }
+.infrastructure-card.tone-teal { --facility-tone: var(--game-teal); }
+.infrastructure-card.tone-rose { --facility-tone: var(--game-danger); }
+.infrastructure-card.tone-blue { --facility-tone: var(--game-info); }
+.infrastructure-card.tone-gold { --facility-tone: var(--game-gold); }
+.infrastructure-card-image { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--game-raised); }
+.infrastructure-card-image > img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+.infrastructure-card:hover .infrastructure-card-image > img { transform: scale(1.025); }
+.infrastructure-card-image::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(4 12 7 / 70%)); pointer-events: none; }
+.infrastructure-image-fallback { display: grid; place-items: center; width: 100%; height: 100%; min-height: 160px; color: var(--game-muted); background: radial-gradient(ellipse at center, var(--game-hover), var(--game-surface)); }
+.infrastructure-level { position: absolute; top: 12px; right: 12px; display: flex; align-items: baseline; gap: 5px; background: rgb(9 17 12 / 90%); border: 1px solid rgb(255 255 255 / 20%); border-radius: 5px; padding: 6px 9px; color: #d1dfd5; font-size: 10px; }
+.infrastructure-level strong { font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--facility-tone); }
+.infrastructure-level small { font-size: 10px; }
+.infrastructure-status { position: absolute; bottom: 13px; left: 16px; z-index: 1; display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 650; color: #eff7f1; text-transform: uppercase; letter-spacing: .04em; }
+.infrastructure-status.is-upgrading i { background: var(--game-gold); }
+.infrastructure-card-body { display: flex; flex-direction: column; flex: 1; padding: 18px 18px 20px; }
+.infrastructure-card-body header { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.infrastructure-card-icon { display: grid; place-items: center; flex-shrink: 0; width: 37px; height: 37px; border-radius: 6px; border: 1px solid var(--game-line); background: var(--game-raised); color: var(--facility-tone); }
+.infrastructure-card-body h4 { font-family: var(--font-display); font-size: 22px; font-weight: 650; line-height: 1.15; }
+.infrastructure-card-body > p { margin: 13px 0 20px; flex: 1; color: var(--game-muted); font-size: 12px; line-height: 1.75; }
+.infrastructure-progress-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 10px; color: var(--game-muted); }
+.infrastructure-progress-label strong { color: var(--facility-tone); font-size: 12px; font-variant-numeric: tabular-nums; }
+.infrastructure-progress-label small { font-size: 10px; color: var(--game-dim); font-weight: 400; }
+.infrastructure-progress { display: flex; gap: 4px; }
+.infrastructure-progress span { flex: 1; min-width: 0; height: 4px; border-radius: 1px; background: var(--game-line); }
+.infrastructure-progress .is-filled { background: var(--facility-tone); }
+.infrastructure-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--game-line); background: var(--game-rail); }
+.infrastructure-next-level { display: flex; flex-direction: column; gap: 4px; color: var(--game-muted); font-size: 10px; }
+.infrastructure-next-level strong { font-weight: 600; font-size: 12px; color: var(--game-text); }
+.infrastructure-upgrade { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 8px 11px; border-radius: 5px; border: 1px solid var(--game-green-line); background: var(--game-accent-soft); color: var(--game-accent); font-size: 11px; font-weight: 650; cursor: pointer; transition: background .2s, border-color .2s; }
+.infrastructure-upgrade:hover:not(:disabled) { background: var(--game-green-deep); border-color: var(--game-accent); }
+.infrastructure-upgrade:disabled { opacity: .5; cursor: not-allowed; }
+.infrastructure-empty { display: grid; justify-items: center; gap: 12px; text-align: center; border: 1px dashed var(--game-line-strong); border-radius: 9px; padding: 45px 20px; color: var(--game-muted); }
+.infrastructure-empty h4 { font-size: 17px; color: var(--game-ink); }
+.infrastructure-empty p { font-size: 12px; }
+.infrastructure-error { padding: 12px; color: var(--game-danger); background: var(--game-danger-soft); border-radius: 5px; font-size: 12px; }
+.infrastructure-construction-rule { display: flex; align-items: flex-start; gap: 8px; margin-top: -10px; font-size: 12px; line-height: 1.7; color: var(--game-muted); }
+.infrastructure-construction-rule svg { flex-shrink: 0; margin-top: 3px; color: var(--game-gold); }
+.infrastructure-construction-banner { display: flex; align-items: center; gap: 13px; padding: 16px 18px; border: 1px solid var(--game-gold-line); border-radius: 8px; background: var(--game-gold-soft); color: var(--game-gold); }
+.infrastructure-construction-banner > svg { flex-shrink: 0; }
+.infrastructure-construction-banner strong { font-size: 13px; }
+.infrastructure-construction-banner p { margin-top: 5px; font-size: 12px; line-height: 1.6; }
+.infrastructure-duration { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 10px; color: var(--game-gold); margin-bottom: 14px; }
+.infrastructure-duration strong { margin-left: auto; font-weight: 600; }
+.infrastructure-card-body > .infrastructure-completion-time { flex: 0; font-size: 10px; margin: -5px 0 14px; color: var(--game-gold); }
+.infrastructure-confirm { display: grid; gap: 12px; line-height: 1.7; font-size: 13px; }
+.infrastructure-confirm b { color: var(--game-accent); }
+.infrastructure-spin { animation: infrastructure-spin 1s linear infinite; }
+@keyframes infrastructure-spin { to { transform: rotate(360deg); } }
+@media (min-width: 1500px) { .infrastructure-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .infrastructure-page { gap: 18px; }
+  .infrastructure-hero { min-height: 320px; }
+  .infrastructure-hero::after { background: linear-gradient(90deg, rgb(8 17 12 / 90%), rgb(8 17 12 / 45%)); }
+  .infrastructure-hero-content { padding: 24px 20px 48px; }
+  .infrastructure-hero-caption { right: 12px; bottom: 12px; max-width: 60%; }
+  .infrastructure-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .infrastructure-overview > div { padding: 16px; }
+  .infrastructure-overview > div:first-child { grid-column: 1 / -1; border-bottom: 1px solid var(--game-line); }
+  .infrastructure-overview > div:nth-child(2) { border-left: 0; }
+  .infrastructure-heading { align-items: flex-start; }
+  .infrastructure-count { display: none; }
+  .infrastructure-grid { gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .infrastructure-card-image > img, .infrastructure-card { transition: none; } .infrastructure-spin { animation: none; } }

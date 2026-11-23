@@ -67,5 +67,6 @@ export const clubsApi = {
 
   upgradeFacility: (clubId: string, facilityId: string) =>
     request(`/clubs/${clubId}/facilities/${facilityId}/upgrade`, { method: 'POST' }),
+  upgradeStadium: (clubId: string) => request(`/clubs/${clubId}/stadium/upgrade`, { method: 'POST' }),
 };
 
