@@ -449,22 +449,17 @@ export interface TrainingPlayer {
   age: number;
   squadType: string;
   fitness: number;
-  agePenalty: number;
   eligible: boolean;
   isInjured: boolean;
   onNationalDuty: boolean;
-  chances: Record<string, number>;
 }
 export interface TrainingOverview {
   squadType: TrainingSquad;
-  baseChance: number;
   slots: number;
   fitnessPerDrill: number;
   fitnessCost: number;
   level: number;
-  levelBonus: number;
   types: TrainingType[];
-  coaches: Record<string, { name: string | null; skill: number; bonus: number }>;
   recommendation: { style: string; headCoach: { name: string } | null; trainingTypeIds: string[] };
   players: TrainingPlayer[];
 }
@@ -479,7 +474,7 @@ export interface TrainingSession {
     completedAt: string;
     players: {
       id: string; name: string; fitnessBefore: number; fitnessAfter: number;
-      drills: { slot: number; chance: number; gains: { attribute: string; from: number; to: number }[] }[];
+      drills: { slot: number; gains: { attribute: string; from: number; to: number }[] }[];
     }[];
   };
 }
