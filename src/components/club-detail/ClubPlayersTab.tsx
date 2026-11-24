@@ -10,6 +10,12 @@ import { Player, ClubSquadGroupsResponse } from '../../types';
 import { useTranslation } from '../../i18n';
 import { PlayerAvatar } from '../common/PlayerAvatar';
 import { formatCurrency } from '../../utils/formatters';
+import { SquadSortHeader } from '../common/SquadSortHeader';
+import {
+  defaultSquadSort, getSquadFitness, getSquadOvr, getSquadPosition, getSquadPositionCategory,
+  getSquadPotential, getSquadValue, nextSquadSort, sortSquadPlayers,
+} from '../../utils/squadSorting';
+import type { SquadSort, SquadSortKey } from '../../utils/squadSorting';
 
 interface Props {
   squadGroups: ClubSquadGroupsResponse | null;
@@ -24,30 +30,21 @@ export const ClubPlayersTab: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   const [squadTab, setSquadTab] = useState<'first' | 'youth'>('first');
+  const [sorts, setSorts] = useState<Record<'first' | 'youth', SquadSort>>({
+    first: defaultSquadSort, youth: defaultSquadSort,
+  });
+  const sort = sorts[squadTab];
+  const handleSort = (key: SquadSortKey) => setSorts(current => ({
+    ...current, [squadTab]: nextSquadSort(current[squadTab], key),
+  }));
   const [playerPosFilter, setPlayerPosFilter] = useState<string>('ALL');
   const [playerSearchTerm, setPlayerSearchTerm] = useState<string>('');
-
-  const getPositionCategory = (posCode?: string) => {
-    if (!posCode) return 'MID';
-    const p = posCode.toUpperCase();
-    if (p.includes('GK')) return 'GK';
-    if (p.includes('CB') || p.includes('LB') || p.includes('RB') || p.includes('DF')) return 'DEF';
-    if (p.includes('ST') || p.includes('CF') || p.includes('LW') || p.includes('RW') || p.includes('FW')) return 'FWD';
-    return 'MID';
-  };
-
-  const getOvrRating = (player: Player) => {
-    if (player.overall_rating && player.overall_rating > 0) return player.overall_rating;
-    if (player.ovr && player.ovr > 0) return player.ovr;
-    return 50;
-  };
 
   const currentSquadList: Player[] =
     squadTab === 'first' ? squadGroups?.firstTeam || [] : squadGroups?.youthTeam || [];
 
   const filteredPlayers = currentSquadList.filter((p) => {
-    const posCode = p.position?.code || p.player_positions?.[0]?.position_code || 'MID';
-    const cat = getPositionCategory(posCode);
+    const cat = getSquadPositionCategory(getSquadPosition(p));
 
     if (playerPosFilter !== 'ALL') {
       if (cat !== playerPosFilter) return false;
@@ -62,17 +59,7 @@ export const ClubPlayersTab: React.FC<Props> = ({
     return true;
   });
 
-  // Sort players by squad_number ascending (#1, #2, #3, ...)
-  const sortedPlayers = [...filteredPlayers].sort((a, b) => {
-    const numA = a.squad_number != null && Number(a.squad_number) > 0 ? Number(a.squad_number) : 9999;
-    const numB = b.squad_number != null && Number(b.squad_number) > 0 ? Number(b.squad_number) : 9999;
-    if (numA !== numB) return numA - numB;
-    const catOrder: Record<string, number> = { GK: 1, DEF: 2, MID: 3, FWD: 4 };
-    const catA = catOrder[getPositionCategory(a.position?.code || a.player_positions?.[0]?.position_code)] || 9;
-    const catB = catOrder[getPositionCategory(b.position?.code || b.player_positions?.[0]?.position_code)] || 9;
-    if (catA !== catB) return catA - catB;
-    return (a.name || '').localeCompare(b.name || '');
-  });
+  const sortedPlayers = sortSquadPlayers(filteredPlayers, sort);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -193,25 +180,27 @@ export const ClubPlayersTab: React.FC<Props> = ({
           <table className="table-hud">
             <thead>
               <tr>
-                <th style={{ width: '50px' }}>{t('club_detail.col_pos', 'SỐ')}</th>
+                <SquadSortHeader sortKey="position" sort={sort} onSort={handleSort}>{t('club_detail.col_pos', 'VỊ TRÍ')}</SquadSortHeader>
                 <th>{t('club_detail.col_player', 'CẦU THỦ')}</th>
-                <th>{t('club_detail.col_pos', 'VỊ TRÍ')}</th>
-                <th>{t('club_detail.col_age', 'TUỔI')}</th>
-                <th>{t('club_detail.col_ovr', 'OVR')}</th>
-                <th>{t('club_detail.col_potential', 'TIỀM NĂNG')}</th>
-                <th>{t('squad.col_fitness', 'THỂ LỰC')}</th>
+                <th style={{ width: '50px' }}>{t('squad.col_number', 'SỐ')}</th>
+                <SquadSortHeader sortKey="age" sort={sort} onSort={handleSort}>{t('club_detail.col_age', 'TUỔI')}</SquadSortHeader>
+                <SquadSortHeader sortKey="ovr" sort={sort} onSort={handleSort}>{t('club_detail.col_ovr', 'OVR')}</SquadSortHeader>
+                <SquadSortHeader sortKey="potential" sort={sort} onSort={handleSort}>{t('club_detail.col_potential', 'TIỀM NĂNG')}</SquadSortHeader>
+                <SquadSortHeader sortKey="fitness" sort={sort} onSort={handleSort}>{t('squad.col_fitness', 'THỂ LỰC')}</SquadSortHeader>
                 <th>{t('club_detail.col_status', 'TRẠNG THÁI')}</th>
-                <th>{t('club_detail.col_value', 'ĐỊNH GIÁ')}</th>
+                <SquadSortHeader sortKey="value" sort={sort} onSort={handleSort}>{t('club_detail.col_value', 'ĐỊNH GIÁ')}</SquadSortHeader>
               </tr>
             </thead>
             <tbody>
               {sortedPlayers.map((player) => {
-                const posCode = player.position?.code || player.player_positions?.[0]?.position_code || 'CM';
-                const posCat = getPositionCategory(posCode);
-                const ovr = getOvrRating(player);
+                const posCode = getSquadPosition(player);
+                const posCat = getSquadPositionCategory(posCode);
+                const ovr = getSquadOvr(player);
+                const potential = getSquadPotential(player);
+                const value = getSquadValue(player);
                 const playerName =
                   player.name || `${player.first_name || ''} ${player.last_name || ''}`.trim() || player.common_name || 'Player';
-                const fitness = player.status?.fitness ?? player.player_status?.fitness;
+                const fitness = getSquadFitness(player);
 
                 return (
                   <tr
@@ -222,9 +211,7 @@ export const ClubPlayersTab: React.FC<Props> = ({
                     title={t('squad.view_player_detail', 'Nhấp để xem chi tiết cầu thủ {name}').replace('{name}', playerName)}
                   >
                     <td>
-                      <strong style={{ color: 'var(--game-accent)', fontFamily: 'var(--font-game)', fontSize: '0.95rem' }}>
-                        {player.squad_number ? `#${player.squad_number}` : '-'}
-                      </strong>
+                      <span className={`position-tag pos-${posCat.toLowerCase()}`}>{posCode}</span>
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -254,21 +241,21 @@ export const ClubPlayersTab: React.FC<Props> = ({
                       </div>
                     </td>
                     <td>
-                      <span className={`position-tag pos-${posCat.toLowerCase()}`}>
-                        {posCode}
-                      </span>
+                      <strong style={{ color: 'var(--game-accent)', fontFamily: 'var(--font-game)', fontSize: '0.95rem' }}>
+                        {player.squad_number ? `#${player.squad_number}` : '-'}
+                      </strong>
                     </td>
                     <td>
                       <span style={{ color: 'var(--game-text)', fontWeight: 600 }}>{player.age}</span>
                     </td>
                     <td>
                       <strong style={{ color: 'var(--game-gold)', fontSize: '1.05rem', fontFamily: 'var(--font-game)' }}>
-                        {ovr}
+                        {ovr ?? '—'}
                       </strong>
                     </td>
                     <td>
                       <strong style={{ color: 'var(--game-accent)', fontFamily: 'var(--font-game)', fontSize: '0.95rem' }}>
-                        ⭐ {player.potential_rating || player.potential || 70}
+                        ⭐ {potential ?? '—'}
                       </strong>
                     </td>
                     <td>
@@ -304,7 +291,7 @@ export const ClubPlayersTab: React.FC<Props> = ({
                     </td>
                     <td>
                       <strong style={{ fontFamily: 'var(--font-game)', color: 'var(--game-ink)' }}>
-                        {formatCurrency(player.market_value)}
+                        {value == null ? '—' : formatCurrency(value)}
                       </strong>
                     </td>
                   </tr>
