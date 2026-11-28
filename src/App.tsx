@@ -1,3 +1,4 @@
+const MatchDetailView = lazy(() => import('./components/MatchDetailView').then(module => ({ default: module.MatchDetailView })));
 import { useState, useEffect, useCallback, lazy } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Club, Player, TimelineData, User } from './types';
@@ -256,7 +257,7 @@ export function App() {
         <Route
           path="/dashboard"
           element={
-            club && <DashboardView club={club} squadCount={players.length} />
+            club && <DashboardView club={club} squadCount={players.length} onMatchSimulated={refreshClubData} />
           }
         />
         <Route
@@ -293,6 +294,7 @@ export function App() {
             />
           }
         />
+        <Route path="/matches/:id" element={<MatchDetailView onMatchSimulated={refreshClubData} />} />
         <Route
           path="/matches"
           element={
@@ -369,7 +371,7 @@ export function App() {
             />
           }
         />
-        <Route path="/clubs/:id" element={<ClubDetailView />} />
+        <Route path="/clubs/:id" element={<ClubDetailView onMatchSimulated={refreshClubData} />} />
       </Route>
 
       {/* Fallback Catch-all Route */}

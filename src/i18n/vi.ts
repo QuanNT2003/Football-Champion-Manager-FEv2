@@ -1,7 +1,15 @@
+import { playerAvailabilityVi } from './player-availability';
+import { sponsorshipsVi } from './sponsorships';
+import { financesVi } from './finances';
+import { matchReportVi } from './match-report';
 import { Translations } from './types';
 import { trainingVi } from './training';
 
 export const vi: Translations = {
+  ...sponsorshipsVi,
+  ...financesVi,
+  ...playerAvailabilityVi,
+  ...matchReportVi,
   'standings.domestic_comps': 'Giải quốc nội',
   'standings.continental_comps': 'Cúp châu lục CLB',
   'standings.international_comps': 'Giải ĐTQG',
@@ -485,6 +493,13 @@ export const vi: Translations = {
   'standings.select_country': 'Chọn Quốc Gia',
   'standings.top_scorers': 'Vua Phá Lưới',
   'standings.top_assists': 'Vua Kiến Tạo',
+  'standings.top_players': 'Cầu thủ xuất sắc nhất',
+  'standings.view_player_detail': 'Nhấp để xem hồ sơ chi tiết cầu thủ',
+  'stats.best_players_criteria': 'Xếp theo điểm trung bình',
+  'stats.no_ratings': 'Chưa có điểm thi đấu nào được ghi nhận.',
+  'stats.rating_unit': 'ĐIỂM',
+  'stats.appearances_unit': 'trận',
+  'stats.motm_unit': 'lần hay nhất trận',
   'transfers.tab_market': 'Thị Trường Cầu Thủ',
   'transfers.tab_staff': 'Thị Trường Ban Huấn Luyện',
   'transfers.tab_offers': 'Đề Nghị Chuyển Nhượng',

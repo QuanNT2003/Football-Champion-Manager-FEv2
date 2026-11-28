@@ -1,0 +1,8 @@
+.player-availability-panel{flex-shrink:0;max-height:160px;overflow-y:auto;padding:9px 18px;background:var(--game-surface);border-bottom:1px solid var(--game-line);color:var(--game-text);font-size:12px}
+.availability-detail{display:flex;align-items:center;gap:8px;min-height:24px;padding:2px 0}
+.availability-detail+.availability-detail{margin-top:3px}
+.availability-detail>svg,.availability-detail>.availability-card{flex-shrink:0;color:var(--game-danger-strong,#e45b58)}
+.availability-detail p{min-width:0;margin:0;line-height:1.5;overflow-wrap:anywhere}
+.availability-detail strong{font-size:12px;font-weight:700;color:var(--game-ink)}
+.availability-detail p>span{color:var(--game-muted)}
+@media(max-width:640px){.player-availability-panel{padding:8px 12px;max-height:140px}}

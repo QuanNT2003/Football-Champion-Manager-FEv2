@@ -140,7 +140,26 @@ export interface PlayerPosition {
   };
 }
 
+export interface PlayerSuspension {
+  applies_to_next_match?: boolean;
+  scope?: 'COMPETITION' | 'ALL_COMPETITIONS' | 'DOMESTIC_LEAGUE_AND_SUPER_CUP';
+  id: string;
+  reason: string;
+  competition_season_id: string | null;
+  competition_name: string | null;
+  matches_banned: number;
+  matches_served: number;
+  matches_remaining: number;
+}
+
 export interface PlayerStatus {
+  yellow_cards?: { season_id: string; competition_season_id: string; competition_name: string | null;
+    total: number; count: number; threshold: number; applies_to_next_match?: boolean;
+    scope?: 'COMPETITION' | 'DOMESTIC_LEAGUE_AND_SUPER_CUP'; country_id?: string | null }[];
+  next_match?: { id: string; competition_season_id: string | null; competition_name: string | null; match_type?: string } | null;
+  injury_days_remaining?: number | null;
+  active_injuries?: { id: string; name: string | null; days_remaining: number }[];
+  suspensions?: PlayerSuspension[];
   condition?: number;
   /** Current fitness used by training and the squad fitness column (0–100). */
   fitness?: number;
@@ -248,6 +267,27 @@ export interface Formation {
   formation_positions: FormationPosition[];
 }
 
+
+export interface MatchGoal {
+  clubId: string | null; playerId: string | null; playerName: string | null;
+  minute: number; addedTime: number; penalty: boolean; ownGoal: boolean;
+}
+export interface MatchReportPlayer {
+  id: string; name: string; shirtNumber?: number | null; position?: string | null;
+  formationPositionId?: string | null; role?: string; duty?: string; started: boolean; isCaptain?: boolean;
+  minutes: number; goals: number; assists: number; rating: number; yellowCards: number; redCards: number;
+  shots?: number; shotsOnTarget?: number; saves?: number; xG?: number; passes?: number; passesCompleted?: number; tacklesWon?: number;
+  coordinates?: { x: number; y: number } | null;
+  fitnessStart?: number; fitnessEnd?: number; conditionEnd?: number; enteredMinute?: number | null; leftMinute?: number | null; injured?: boolean;
+}
+export interface MatchLineupReport {
+  id?: string; clubId: string; squadType?: string;
+  formation?: { id: string; code: string; name: string };
+  tactic?: { mentality: string; tempo: number; passingStyle: string; pressing: number; defensiveLine: number };
+  coaches: { id: string; name: string; role: string }[];
+  players: MatchReportPlayer[];
+}
+
 export interface MatchEvent {
   id: string;
   minute: number;
@@ -255,15 +295,21 @@ export interface MatchEvent {
   clubId?: string;
   player?: { id: string; name: string };
   relatedPlayer?: { id: string; name: string };
-  metadata?: { description: string };
+  metadata?: Record<string, string | number | boolean | null> & { description?: string; addedTime?: number; sequence?: number; phase?: string };
+}
+
+export interface MatchRankingSide {
+  clubId: string; pointsBefore: number; pointsAfter: number; change: number;
+  rankBefore: number; rankAfter: number;
 }
 
 export interface Match {
+  ranking?: { home: MatchRankingSide; away: MatchRankingSide; positionsUpdated?: boolean } | null;
   id: string;
   season_day: number;
   match_date: string;
   kickoff_time: string;
-  status: 'SCHEDULED' | 'FINISHED';
+  status: 'SCHEDULED' | 'IN_PROGRESS' | 'FINISHED' | 'COMPLETED';
   competitionSeason?: { id: string; name: string } | null;
   stage?: { id: string; name: string } | null;
   round?: { id: string; name: string; round_no: number } | null;
@@ -274,6 +320,15 @@ export interface Match {
   stadium?: { id: string; name: string; capacity: number } | string;
   homeClub: { id: string; name: string; logo_url?: string };
   awayClub: { id: string; name: string; logo_url?: string };
+  homeRegularScore?: number | null; awayRegularScore?: number | null;
+  homeExtraScore?: number | null; awayExtraScore?: number | null;
+  homePenaltyScore?: number | null; awayPenaltyScore?: number | null;
+  resultType?: 'REGULAR' | 'EXTRA_TIME' | 'PENALTIES' | 'WALKOVER';
+  winnerClubId?: string | null; aggregateHome?: number | null; aggregateAway?: number | null;
+  duration?: number | null; motmPlayerId?: string | null;
+  statistics?: { home: Record<string, number> | null; away: Record<string, number> | null };
+  lineups?: MatchLineupReport[];
+  scorers?: MatchGoal[];
   events?: MatchEvent[];
 }
 
@@ -378,6 +433,9 @@ export interface PlayerStat {
   };
   goals?: number;
   assists?: number;
+  appearances?: number;
+  rating?: number | string;
+  motm?: number;
 }
 
 export interface TransferOffer {
@@ -420,7 +478,7 @@ export interface LedgerTransaction {
   club_id: string;
   transaction_type: string;
   amount: number;
-  balance_after: number;
+  balance_after?: number;
   description?: string;
   created_at: string;
 }
@@ -617,7 +675,7 @@ export interface PlayerInjuryItem {
   days_remaining?: number;
   season: string;
   start_date: string;
-  status: 'ACTIVE' | 'RECOVERED';
+  status: 'ACTIVE' | 'RECOVERING' | 'RECOVERED';
 }
 
 export interface PlayerInjuriesData {
@@ -650,6 +708,7 @@ export interface PlayerDetailData extends Player {
   weight?: string;
   preferred_foot?: string;
   active_injury?: {
+    id?: string;
     injury_type: string;
     severity: string;
     days_remaining: number;
@@ -733,6 +792,7 @@ export interface DashboardData {
     };
   } | null;
   last_match?: {
+    scorers?: MatchGoal[];
     id?: string;
     competition_name: string;
     home_club_id?: string;
@@ -831,6 +891,8 @@ export interface ClubMatchItem {
     short_name?: string;
     logo_url?: string;
   };
+  scorers?: MatchGoal[];
+  home_penalty_score?: number | null; away_penalty_score?: number | null; result_type?: string;
   home_score?: number | null;
   away_score?: number | null;
   result?: 'W' | 'D' | 'L' | null;

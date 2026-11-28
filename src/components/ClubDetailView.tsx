@@ -35,7 +35,7 @@ import {
   ClubStadiumTab,
 } from './club-detail';
 
-export const ClubDetailView: React.FC = () => {
+export const ClubDetailView: React.FC<{ onMatchSimulated?: () => void | Promise<void> }> = ({ onMatchSimulated }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -408,6 +408,7 @@ export const ClubDetailView: React.FC = () => {
           matches={matches}
           loadingMatches={loadingMatches}
           club={club}
+          onMatchSimulated={async () => { setMatches(await clubsApi.getMatches(club.id) || []); await onMatchSimulated?.(); }}
         />
       )}
 

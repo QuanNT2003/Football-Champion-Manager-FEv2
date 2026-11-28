@@ -1,3 +1,5 @@
+import { MatchPreviewLink } from '../MatchPreviewLink';
+import { MatchScorers } from '../MatchScorers';
 import { formatKickoffTime } from '../../utils/matchTime';
 import React, { useState } from 'react';
 import {
@@ -14,12 +16,14 @@ interface Props {
   matches: ClubMatchItem[];
   loadingMatches: boolean;
   club: Club;
+  onMatchSimulated?: () => void | Promise<void>;
 }
 
 export const ClubMatchesTab: React.FC<Props> = ({
   matches,
   loadingMatches,
   club,
+  onMatchSimulated,
 }) => {
   const { t } = useTranslation();
   const { comp } = useTournamentLocale();
@@ -103,7 +107,7 @@ export const ClubMatchesTab: React.FC<Props> = ({
                     </div>
                   )}
 
-                  <div className="season-fixture-card my-match" style={{ cursor: 'default' }}>
+                  <MatchPreviewLink matchId={m.id} onMatchSimulated={onMatchSimulated} className="season-fixture-card my-match" style={{ cursor: 'pointer', display: 'block', color: 'inherit', textDecoration: 'none' }}>
                     {/* Top bar: Giải đấu + Badges */}
                     <div className="fixture-card-top">
                       <div className="fixture-comp-tag">
@@ -199,7 +203,8 @@ export const ClubMatchesTab: React.FC<Props> = ({
                         </span>
                       </div>
                     </div>
-                  </div>
+                    {isFinished && <MatchScorers goals={m.scorers || []} homeId={m.home_team?.id} awayId={m.away_team?.id} />}
+                  </MatchPreviewLink>
                 </React.Fragment>
               );
             })}

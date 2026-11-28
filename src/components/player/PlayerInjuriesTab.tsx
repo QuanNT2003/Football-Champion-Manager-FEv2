@@ -29,7 +29,7 @@ export const PlayerInjuriesTab: React.FC<Props> = ({ detail }) => {
                         <HeartPulse size={20} />
                         <div>
                           <strong>{t('injury.healthy_title', 'Thể trạng hoàn toàn khỏe mạnh')}</strong>
-                          <p>{t('injury.healthy_desc', 'Cầu thủ sẵn sàng 100% cho mọi trận đấu và các bài tập huấn luyện.')}</p>
+                          <p>{t('availability.no_active_injury', 'Không có chấn thương đang điều trị.')}</p>
                         </div>
                       </div>
                     )}
@@ -79,7 +79,7 @@ export const PlayerInjuriesTab: React.FC<Props> = ({ detail }) => {
                             <td className="text-right">
                               <span
                                 className={`pm-status-tag ${
-                                  inj.status === 'ACTIVE' ? 'tag-active' : 'tag-recovered'
+                                  ['ACTIVE', 'RECOVERING'].includes(inj.status) ? 'tag-active' : 'tag-recovered'
                                 }`}
                               >
                                 {inj.status === 'ACTIVE' ? t('injury.status_active', 'Đang điều trị') : t('injury.status_recovered', 'Đã bình phục')}

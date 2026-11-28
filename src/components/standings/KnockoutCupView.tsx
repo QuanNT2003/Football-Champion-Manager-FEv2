@@ -38,6 +38,7 @@ export const KnockoutCupView: React.FC = () => {
   const [teams, setTeams] = useState<CompetitionTeam[]>([]);
   const [topScorers, setTopScorers] = useState<PlayerStat[]>([]);
   const [topAssists, setTopAssists] = useState<PlayerStat[]>([]);
+  const [topPlayers, setTopPlayers] = useState<PlayerStat[]>([]);
   const [showCountryModal, setShowCountryModal] = useState<boolean>(false);
 
   // Load countries
@@ -71,12 +72,14 @@ export const KnockoutCupView: React.FC = () => {
         setTeams(Array.isArray(teamsData) ? teamsData : []);
 
         // 4. Load stats
-        const [scorers, assists] = await Promise.all([
+        const [scorers, assists, bestPlayers] = await Promise.all([
           competitionsApi.getTopScorers(cupId, viewingCountryId, 10),
           competitionsApi.getTopAssists(cupId, viewingCountryId, 10),
+          competitionsApi.getTopPlayers(cupId, viewingCountryId, 10),
         ]);
         setTopScorers(Array.isArray(scorers) ? scorers : []);
         setTopAssists(Array.isArray(assists) ? assists : []);
+        setTopPlayers(Array.isArray(bestPlayers) ? bestPlayers : []);
 
       } catch (err) {
         console.error('Failed to load knockout cup data:', err);
@@ -288,6 +291,7 @@ export const KnockoutCupView: React.FC = () => {
         <LeagueStatsView
           topScorers={topScorers}
           topAssists={topAssists}
+          topPlayers={topPlayers}
         />
       )}
 

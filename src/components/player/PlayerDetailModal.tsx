@@ -1,3 +1,4 @@
+import { PlayerAvailabilityPanel } from './PlayerAvailabilityPanel';
 import { useTranslation } from '../../i18n';
 ﻿import { ConfirmModal } from '../common/ConfirmModal';
 import { PlayerSkillsTab } from './PlayerSkillsTab';
@@ -785,6 +786,7 @@ export const PlayerDetailModal: React.FC<Props> = ({
 
           {/* RIGHT COLUMN: TABS & CONTENT */}
           <div className="pm-right-col">
+            <PlayerAvailabilityPanel player={player} detail={detail} loading={loading} />
             {/* 5 Tabs Navigation Header */}
             <div className="pm-tabs-bar">
               <button

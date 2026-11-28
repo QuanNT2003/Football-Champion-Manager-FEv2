@@ -155,6 +155,16 @@ export const competitionsApi = {
     return request<PlayerStat[]>(url);
   },
 
+  getTopPlayers: (competitionId: string, countryId?: string, limit?: number, groupId?: string) => {
+    let url = `/competitions/${competitionId}/top-players`;
+    const params: string[] = [];
+    if (countryId) params.push(`countryId=${encodeURIComponent(countryId)}`);
+    if (limit) params.push(`limit=${limit}`);
+    if (groupId) params.push(`groupId=${encodeURIComponent(groupId)}`);
+    if (params.length > 0) url += `?${params.join('&')}`;
+    return request<PlayerStat[]>(url);
+  },
+
   getTeams: (competitionId: string, countryId?: string, groupId?: string) => {
     let url = `/competitions/${competitionId}/teams`;
     const params: string[] = [];

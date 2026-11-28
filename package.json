@@ -4,13 +4,16 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
+    "test:availability": "node --test test/player-availability.test.cjs",
     "test:training": "node --test test/training.test.cjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test:scheduling": "node --test test/match-time.test.cjs",
-    "test:i18n": "node --test test/tournament-localization.test.cjs"
+    "test:i18n": "node --test test/tournament-localization.test.cjs",
+    "test:matches": "node --test test/match-report.test.cjs",
+    "test:finances": "node --test test/finances.test.cjs test/sponsorship-localization.test.cjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

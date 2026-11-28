@@ -1,3 +1,5 @@
+import { PlayerAvailabilityBadges } from './common/PlayerAvailabilityBadges';
+import { hasPlayerRestrictions } from '../utils/playerAvailability';
 import { useTranslation } from '../i18n';
 import { PlayerAvatar } from './common/PlayerAvatar';
 import React, { useState } from 'react';
@@ -268,6 +270,7 @@ export const SquadView: React.FC<Props> = ({ players, onSelectPlayer, onRefreshS
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <strong style={{ color: 'var(--game-ink)', fontSize: '0.95rem' }}>{playerName}</strong>
+                            <PlayerAvailabilityBadges player={player} onInspect={() => onSelectPlayer(player)} />
                             {player.is_on_loan && (
                               <span
                                 style={{
@@ -339,24 +342,12 @@ export const SquadView: React.FC<Props> = ({ players, onSelectPlayer, onRefreshS
                         </span>
                       </div>
                     </td>
-                    <td>
-                      {player.status?.is_injured ? (
-                        <span style={{ background: 'var(--game-danger-soft)', color: 'var(--game-danger)', border: '1px solid var(--game-danger-line)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
-                          {t('squad.status_injured', 'Chấn Thương 🚑')}
-                        </span>
-                      ) : player.status?.is_suspended ? (
-                        <span style={{ background: 'var(--game-danger-soft)', color: 'var(--game-danger)', border: '1px solid var(--game-danger-line)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
-                          {t('squad.status_suspended', 'Treo Giò 🟥')}
-                        </span>
-                      ) : player.status?.is_transfer_listed ? (
-                        <span style={{ background: 'var(--game-gold-soft)', color: 'var(--game-gold)', border: '1px solid var(--game-gold-line)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
-                          {t('squad.status_listed', 'Rao Bán 🏷️')}
-                        </span>
+                    <td className="squad-status-cell">
+                      {!hasPlayerRestrictions(player) && (player.status?.is_transfer_listed ? (
+                        <span className="badge badge-warning">{t('squad.status_listed', 'Rao Bán 🏷️')}</span>
                       ) : (
-                        <span style={{ background: 'var(--game-accent-soft)', color: 'var(--game-accent)', border: '1px solid var(--game-green-line)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
-                          {t('squad.status_ready', 'Sẵn Sàng')}
-                        </span>
-                      )}
+                        <span className="badge badge-success">{t('squad.status_ready', 'Sẵn Sàng')}</span>
+                      ))}
                     </td>
                     <td>
                       <strong style={{ color: 'var(--game-success)', fontFamily: 'var(--font-game)', fontSize: '0.95rem' }}>

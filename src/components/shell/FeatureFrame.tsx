@@ -11,7 +11,7 @@ export function FeatureFrame({ children }: { children: ReactNode }) {
   const page = navigation.find(item => item.to === pathname)
     ?? (isFederationPath(pathname) ? competitionsLink : null);
 
-  if (pathname.startsWith('/clubs/')) return <div className="game-feature-body">{children}</div>;
+  if (pathname.startsWith('/clubs/') || pathname.startsWith('/matches/')) return <div className="game-feature-body">{children}</div>;
   if (pathname === '/club/transfers') return children;
   if (!page) return children;
 

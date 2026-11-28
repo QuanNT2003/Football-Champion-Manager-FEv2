@@ -1,7 +1,15 @@
+import { playerAvailabilityEn } from './player-availability';
+import { sponsorshipsEn } from './sponsorships';
+import { financesEn } from './finances';
+import { matchReportEn } from './match-report';
 import { Translations } from './types';
 import { trainingEn } from './training';
 
 export const en: Translations = {
+  ...sponsorshipsEn,
+  ...financesEn,
+  ...playerAvailabilityEn,
+  ...matchReportEn,
   'standings.domestic_comps': 'Domestic Competitions',
   'standings.continental_comps': 'Continental Club Cups',
   'standings.international_comps': 'National Team Cups',
@@ -485,6 +493,13 @@ export const en: Translations = {
   'standings.select_country': 'Select Country',
   'standings.top_scorers': 'Top Scorers',
   'standings.top_assists': 'Top Assists',
+  'standings.top_players': 'Best Players',
+  'standings.view_player_detail': 'Click to view player details',
+  'stats.best_players_criteria': 'Ranked by average match rating',
+  'stats.no_ratings': 'No match ratings recorded yet.',
+  'stats.rating_unit': 'RATING',
+  'stats.appearances_unit': 'apps',
+  'stats.motm_unit': 'MOTM',
   'transfers.tab_market': 'Player Market',
   'transfers.tab_staff': 'Staff Market',
   'transfers.tab_offers': 'Transfer Bids & Offers',

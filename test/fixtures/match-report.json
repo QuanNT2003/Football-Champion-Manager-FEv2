@@ -1,0 +1,920 @@
+{
+  "id": "42",
+  "season_day": 7,
+  "match_date": "2026-11-25T00:00:00Z",
+  "kickoff_time": "19:30",
+  "status": "FINISHED",
+  "competitionSeason": {
+    "id": "1",
+    "name": "Vietnam League 1"
+  },
+  "round": {
+    "id": "1",
+    "name": "Round 7",
+    "round_no": 7
+  },
+  "homeClub": {
+    "id": "10",
+    "name": "Sài Gòn FC"
+  },
+  "awayClub": {
+    "id": "20",
+    "name": "Hà Nội United"
+  },
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeRegularScore": 2,
+  "awayRegularScore": 1,
+  "homeExtraScore": null,
+  "awayExtraScore": null,
+  "homePenaltyScore": null,
+  "awayPenaltyScore": null,
+  "resultType": "REGULAR",
+  "winnerClubId": "10",
+  "attendance": 18240,
+  "stadium": {
+    "id": "1",
+    "name": "Sân Thống Nhất",
+    "capacity": 22000
+  },
+  "motmPlayerId": "109",
+  "duration": 95,
+  "statistics": {
+    "home": {
+      "possession": 56,
+      "shots": 14,
+      "shotsOnTarget": 7,
+      "shotsBlocked": 3,
+      "xG": 2.15,
+      "passes": 420,
+      "passAccuracy": 86,
+      "tackles": 19,
+      "tacklesWon": 13,
+      "saves": 3,
+      "corners": 6,
+      "offsides": 2,
+      "fouls": 11,
+      "yellowCards": 1,
+      "redCards": 0,
+      "substitutions": 3,
+      "injuries": 0
+    },
+    "away": {
+      "possession": 44,
+      "shots": 9,
+      "shotsOnTarget": 4,
+      "shotsBlocked": 1,
+      "xG": 1.08,
+      "passes": 350,
+      "passAccuracy": 79,
+      "tackles": 23,
+      "tacklesWon": 15,
+      "saves": 5,
+      "corners": 3,
+      "offsides": 1,
+      "fouls": 14,
+      "yellowCards": 0,
+      "redCards": 1,
+      "substitutions": 4,
+      "injuries": 0
+    }
+  },
+  "lineups": [
+    {
+      "id": "lineup-10",
+      "clubId": "10",
+      "formation": {
+        "id": "1",
+        "code": "4-3-3",
+        "name": "4-3-3"
+      },
+      "tactic": {
+        "mentality": "BALANCED",
+        "tempo": 55,
+        "passingStyle": "SHORT",
+        "pressing": 65,
+        "defensiveLine": 50
+      },
+      "coaches": [
+        {
+          "id": "1001",
+          "name": "Hoàng Đức Minh",
+          "role": "HEAD_COACH"
+        },
+        {
+          "id": "1002",
+          "name": "Trần Quốc Bảo",
+          "role": "ASSISTANT_COACH"
+        }
+      ],
+      "players": [
+        {
+          "id": "100",
+          "name": "Lê Minh Hải",
+          "shirtNumber": 1,
+          "position": "GK",
+          "formationPositionId": "1",
+          "coordinates": {
+            "x": 50,
+            "y": 8
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 3,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "101",
+          "name": "Nguyễn Văn Long",
+          "shirtNumber": 2,
+          "position": "LB",
+          "formationPositionId": "2",
+          "coordinates": {
+            "x": 15,
+            "y": 25
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "102",
+          "name": "Phạm Quốc Anh",
+          "shirtNumber": 3,
+          "position": "CB",
+          "formationPositionId": "3",
+          "coordinates": {
+            "x": 38,
+            "y": 22
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "103",
+          "name": "Đỗ Hoàng Nam",
+          "shirtNumber": 4,
+          "position": "CB",
+          "formationPositionId": "4",
+          "coordinates": {
+            "x": 62,
+            "y": 22
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "104",
+          "name": "Trần Văn Sơn",
+          "shirtNumber": 5,
+          "position": "RB",
+          "formationPositionId": "5",
+          "coordinates": {
+            "x": 85,
+            "y": 25
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 1,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "105",
+          "name": "Đặng Minh Đức",
+          "shirtNumber": 6,
+          "position": "DM",
+          "formationPositionId": "6",
+          "coordinates": {
+            "x": 50,
+            "y": 42
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": true,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "106",
+          "name": "Lê Quốc Huy",
+          "shirtNumber": 7,
+          "position": "CM",
+          "formationPositionId": "7",
+          "coordinates": {
+            "x": 32,
+            "y": 56
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "107",
+          "name": "Trần Gia Bảo",
+          "shirtNumber": 8,
+          "position": "CM",
+          "formationPositionId": "8",
+          "coordinates": {
+            "x": 68,
+            "y": 56
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "108",
+          "name": "Phan Hoàng Phúc",
+          "shirtNumber": 9,
+          "position": "LW",
+          "formationPositionId": "9",
+          "coordinates": {
+            "x": 18,
+            "y": 80
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 1,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "109",
+          "name": "Nguyễn Tiến Linh",
+          "shirtNumber": 10,
+          "position": "ST",
+          "formationPositionId": "10",
+          "coordinates": {
+            "x": 50,
+            "y": 88
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 2,
+          "assists": 0,
+          "shots": 5,
+          "saves": 0,
+          "rating": 8.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "110",
+          "name": "Vũ Anh Khoa",
+          "shirtNumber": 11,
+          "position": "RW",
+          "formationPositionId": "11",
+          "coordinates": {
+            "x": 82,
+            "y": 80
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "111",
+          "name": "Bùi Minh Tuấn",
+          "shirtNumber": 12,
+          "position": "GK",
+          "formationPositionId": null,
+          "coordinates": null,
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": false,
+          "isCaptain": false,
+          "minutes": 0,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 0,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 100,
+          "enteredMinute": null,
+          "leftMinute": null
+        },
+        {
+          "id": "112",
+          "name": "Lê Thanh Bình",
+          "shirtNumber": 13,
+          "position": "ST",
+          "formationPositionId": null,
+          "coordinates": null,
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": false,
+          "isCaptain": false,
+          "minutes": 0,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 0,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 100,
+          "enteredMinute": null,
+          "leftMinute": null
+        }
+      ]
+    },
+    {
+      "id": "lineup-20",
+      "clubId": "20",
+      "formation": {
+        "id": "1",
+        "code": "4-3-3",
+        "name": "4-3-3"
+      },
+      "tactic": {
+        "mentality": "BALANCED",
+        "tempo": 55,
+        "passingStyle": "SHORT",
+        "pressing": 65,
+        "defensiveLine": 50
+      },
+      "coaches": [
+        {
+          "id": "2001",
+          "name": "Daniel Harris",
+          "role": "HEAD_COACH"
+        },
+        {
+          "id": "2002",
+          "name": "Alex Scott",
+          "role": "ASSISTANT_COACH"
+        }
+      ],
+      "players": [
+        {
+          "id": "200",
+          "name": "Oliver Grant",
+          "shirtNumber": 1,
+          "position": "GK",
+          "formationPositionId": "1",
+          "coordinates": {
+            "x": 50,
+            "y": 8
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 3,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "201",
+          "name": "Noah Blake",
+          "shirtNumber": 2,
+          "position": "LB",
+          "formationPositionId": "2",
+          "coordinates": {
+            "x": 15,
+            "y": 25
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "202",
+          "name": "Jack Turner",
+          "shirtNumber": 3,
+          "position": "CB",
+          "formationPositionId": "3",
+          "coordinates": {
+            "x": 38,
+            "y": 22
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 1,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "203",
+          "name": "Ethan Brooks",
+          "shirtNumber": 4,
+          "position": "CB",
+          "formationPositionId": "4",
+          "coordinates": {
+            "x": 62,
+            "y": 22
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "204",
+          "name": "Liam Carter",
+          "shirtNumber": 5,
+          "position": "RB",
+          "formationPositionId": "5",
+          "coordinates": {
+            "x": 85,
+            "y": 25
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "205",
+          "name": "Lucas Reed",
+          "shirtNumber": 6,
+          "position": "DM",
+          "formationPositionId": "6",
+          "coordinates": {
+            "x": 50,
+            "y": 42
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": true,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "206",
+          "name": "Henry Stone",
+          "shirtNumber": 7,
+          "position": "CM",
+          "formationPositionId": "7",
+          "coordinates": {
+            "x": 32,
+            "y": 56
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "207",
+          "name": "Oscar Bennett",
+          "shirtNumber": 8,
+          "position": "CM",
+          "formationPositionId": "8",
+          "coordinates": {
+            "x": 68,
+            "y": 56
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "208",
+          "name": "Leo Clarke",
+          "shirtNumber": 9,
+          "position": "LW",
+          "formationPositionId": "9",
+          "coordinates": {
+            "x": 18,
+            "y": 80
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 1,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "209",
+          "name": "Marcus Cole",
+          "shirtNumber": 10,
+          "position": "ST",
+          "formationPositionId": "10",
+          "coordinates": {
+            "x": 50,
+            "y": 88
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 1,
+          "assists": 0,
+          "shots": 5,
+          "saves": 0,
+          "rating": 8.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "210",
+          "name": "James Parker",
+          "shirtNumber": 11,
+          "position": "RW",
+          "formationPositionId": "11",
+          "coordinates": {
+            "x": 82,
+            "y": 80
+          },
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": true,
+          "isCaptain": false,
+          "minutes": 95,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 6.8,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 81,
+          "enteredMinute": 0,
+          "leftMinute": null
+        },
+        {
+          "id": "211",
+          "name": "Max Evans",
+          "shirtNumber": 12,
+          "position": "GK",
+          "formationPositionId": null,
+          "coordinates": null,
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": false,
+          "isCaptain": false,
+          "minutes": 0,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 0,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 100,
+          "enteredMinute": null,
+          "leftMinute": null
+        },
+        {
+          "id": "212",
+          "name": "Theo Miller",
+          "shirtNumber": 13,
+          "position": "ST",
+          "formationPositionId": null,
+          "coordinates": null,
+          "role": "STANDARD",
+          "duty": "SUPPORT",
+          "started": false,
+          "isCaptain": false,
+          "minutes": 0,
+          "goals": 0,
+          "assists": 0,
+          "shots": 0,
+          "saves": 0,
+          "rating": 0,
+          "yellowCards": 0,
+          "redCards": 0,
+          "fitnessEnd": 100,
+          "enteredMinute": null,
+          "leftMinute": null
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "1",
+      "minute": 12,
+      "eventType": "GOAL",
+      "clubId": "10",
+      "player": {
+        "id": "109",
+        "name": "Nguyễn Tiến Linh"
+      },
+      "metadata": {
+        "addedTime": 0,
+        "sequence": 1
+      }
+    },
+    {
+      "id": "2",
+      "minute": 35,
+      "eventType": "YELLOW_CARD",
+      "clubId": "10",
+      "player": {
+        "id": "104",
+        "name": "Trần Văn Sơn"
+      },
+      "metadata": {
+        "addedTime": 0,
+        "sequence": 2
+      }
+    },
+    {
+      "id": "3",
+      "minute": 45,
+      "eventType": "GOAL",
+      "clubId": "10",
+      "player": {
+        "id": "109",
+        "name": "Nguyễn Tiến Linh"
+      },
+      "metadata": {
+        "addedTime": 2,
+        "shotType": "PENALTY",
+        "sequence": 3
+      }
+    },
+    {
+      "id": "4",
+      "minute": 45,
+      "eventType": "TEAM_TALK",
+      "clubId": "10",
+      "metadata": {
+        "addedTime": 2,
+        "sequence": 4
+      }
+    },
+    {
+      "id": "5",
+      "minute": 76,
+      "eventType": "GOAL",
+      "clubId": "20",
+      "player": {
+        "id": "209",
+        "name": "Marcus Cole"
+      },
+      "metadata": {
+        "addedTime": 0,
+        "sequence": 5
+      }
+    },
+    {
+      "id": "6",
+      "minute": 81,
+      "eventType": "RED_CARD",
+      "clubId": "20",
+      "player": {
+        "id": "202",
+        "name": "Jack Turner"
+      },
+      "metadata": {
+        "addedTime": 0,
+        "sequence": 6
+      }
+    }
+  ],
+  "scorers": [
+    {
+      "clubId": "10",
+      "playerId": "109",
+      "playerName": "Nguyễn Tiến Linh",
+      "minute": 12,
+      "addedTime": 0,
+      "penalty": false,
+      "ownGoal": false
+    },
+    {
+      "clubId": "10",
+      "playerId": "109",
+      "playerName": "Nguyễn Tiến Linh",
+      "minute": 45,
+      "addedTime": 2,
+      "penalty": true,
+      "ownGoal": false
+    },
+    {
+      "clubId": "20",
+      "playerId": "209",
+      "playerName": "Marcus Cole",
+      "minute": 76,
+      "addedTime": 0,
+      "penalty": false,
+      "ownGoal": false
+    }
+  ]
+}

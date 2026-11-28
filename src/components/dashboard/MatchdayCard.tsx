@@ -1,3 +1,5 @@
+import { MatchPreviewLink } from '../MatchPreviewLink';
+import { MatchScorers } from '../MatchScorers';
 import { formatKickoffTime } from '../../utils/matchTime';
 import { ArrowRight, ClipboardList, Swords } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -19,10 +21,11 @@ function ClubName({ id, name }: { id?: string; name?: string }) {
   return id ? <Link to={`/clubs/${id}`}>{name}</Link> : <span>{name}</span>;
 }
 
-export function MatchdayCard({ club, next, last }: {
+export function MatchdayCard({ club, next, last, onMatchSimulated }: {
   club: Club;
   next: DashboardData['next_match'];
   last: DashboardData['last_match'];
+  onMatchSimulated?: () => void | Promise<void>;
 }) {
   const { t } = useTranslation();
   const { comp } = useTournamentLocale();
@@ -53,7 +56,7 @@ export function MatchdayCard({ club, next, last }: {
         )}
       </div>
       <div className="game-match-actions">
-        <Link to="/matches" className="game-action game-action-primary">{t('nav.dock.matches')} <ArrowRight size={16} /></Link>
+        <MatchPreviewLink matchId={next?.id} onMatchSimulated={onMatchSimulated} className="game-action game-action-primary">{t('nav.dock.matches')} <ArrowRight size={16} /></MatchPreviewLink>
         <Link to="/tactics" className="game-action game-action-outline"><ClipboardList size={16} /> {t('dashboard.match.tactics_btn')}</Link>
       </div>
       <div className="game-last-match">
@@ -62,10 +65,11 @@ export function MatchdayCard({ club, next, last }: {
           <>
             <strong>
               <ClubName id={last.home_club_id} name={last.home_club_name} />
-              <b>{last.home_score}–{last.away_score}</b>
+              <MatchPreviewLink matchId={last.id} onMatchSimulated={onMatchSimulated} aria-label={t('matches.match_details')}><b>{last.home_score}–{last.away_score}</b></MatchPreviewLink>
               <ClubName id={last.away_club_id} name={last.away_club_name} />
             </strong>
             <small>{comp(last.competition_name)}</small>
+            <MatchScorers goals={last.scorers || []} homeId={last.home_club_id} awayId={last.away_club_id} />
           </>
         ) : <small>{t('dashboard.match.no_previous_match')}</small>}
       </div>

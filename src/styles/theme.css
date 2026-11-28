@@ -80,6 +80,8 @@ body {
   background: var(--game-bg);
   color: var(--game-ink);
   font-family: var(--font-body);
+  /* Clip horizontal overflow without trapping the sticky sidebar and topbar. */
+  overflow-x: clip;
 }
 
 :focus-visible {

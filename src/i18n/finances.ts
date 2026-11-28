@@ -1,0 +1,31 @@
+export const financesVi = {
+  'finances.cash_hint': 'Ngân sách chuyển nhượng, trả lương và nâng cấp CLB.',
+  'finances.gold_hint': 'Dùng vàng để đổi thêm ngân sách tiền mặt.',
+  'finances.health': 'Sức khỏe tài chính',
+  'finances.health_grade': 'Hạng A+',
+  'finances.health_hint': 'Tuân thủ FFP · Không có khoản nợ tồn đọng',
+  'finances.exchange_title': 'Đổi vàng sang tiền',
+  'finances.exchange_hint': 'Chọn gói quy đổi để bổ sung ngay ngân sách cho CLB.',
+  'finances.exchange': 'Quy đổi',
+  'finances.exchanging': 'Đang đổi…',
+  'finances.exchange_success': 'Đã đổi {gold} vàng, nhận {cash}.',
+  'finances.exchange_error': 'Quy đổi thất bại. Vui lòng thử lại.',
+  'finances.shop_empty': 'Hiện chưa có gói quy đổi khả dụng.',
+  'finances.balance_after': 'Số dư',
+};
+
+export const financesEn: typeof financesVi = {
+  'finances.cash_hint': 'Available for transfers, wages and club upgrades.',
+  'finances.gold_hint': 'Exchange gold for additional cash funds.',
+  'finances.health': 'Financial health',
+  'finances.health_grade': 'Grade A+',
+  'finances.health_hint': 'FFP compliant · No outstanding debt',
+  'finances.exchange_title': 'Gold currency exchange',
+  'finances.exchange_hint': 'Choose an exchange package to add funds to your club instantly.',
+  'finances.exchange': 'Exchange',
+  'finances.exchanging': 'Exchanging…',
+  'finances.exchange_success': 'Exchanged {gold} gold and received {cash}.',
+  'finances.exchange_error': 'Exchange failed. Please try again.',
+  'finances.shop_empty': 'No exchange packages are currently available.',
+  'finances.balance_after': 'Balance',
+};

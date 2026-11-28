@@ -54,6 +54,7 @@ export const LeagueView: React.FC = () => {
   const [teams, setTeams] = useState<CompetitionTeam[]>([]);
   const [topScorers, setTopScorers] = useState<PlayerStat[]>([]);
   const [topAssists, setTopAssists] = useState<PlayerStat[]>([]);
+  const [topPlayers, setTopPlayers] = useState<PlayerStat[]>([]);
 
   // Country Modal
   const [showCountryModal, setShowCountryModal] = useState<boolean>(false);
@@ -166,13 +167,15 @@ export const LeagueView: React.FC = () => {
         );
         setTeams(Array.isArray(teamsData) ? teamsData : []);
 
-        // 3. Top Scorers & Top Assists (Lọc riêng của bảng đó)
-        const [scorers, assists] = await Promise.all([
+        // 3. Player leaderboards (Lọc riêng của bảng đó)
+        const [scorers, assists, bestPlayers] = await Promise.all([
           competitionsApi.getTopScorers(currentComp.id, viewingCountryId, 10, selectedGroupId || undefined),
           competitionsApi.getTopAssists(currentComp.id, viewingCountryId, 10, selectedGroupId || undefined),
+          competitionsApi.getTopPlayers(currentComp.id, viewingCountryId, 10, selectedGroupId || undefined),
         ]);
         setTopScorers(Array.isArray(scorers) ? scorers : []);
         setTopAssists(Array.isArray(assists) ? assists : []);
+        setTopPlayers(Array.isArray(bestPlayers) ? bestPlayers : []);
 
       } catch (err) {
         console.error('Failed to load league standings/teams/stats:', err);
@@ -594,6 +597,7 @@ export const LeagueView: React.FC = () => {
         <LeagueStatsView
           topScorers={topScorers}
           topAssists={topAssists}
+          topPlayers={topPlayers}
         />
       )}
 

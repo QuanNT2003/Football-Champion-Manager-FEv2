@@ -1,3 +1,5 @@
+import { PlayerDetailModal } from './player/PlayerDetailModal';
+import { PlayerAvailabilityBadges } from './common/PlayerAvailabilityBadges';
 import { useTranslation } from '../i18n';
 import { PlayerAvatar } from './common/PlayerAvatar';
 import { StaffAvatar } from './common/StaffAvatar';
@@ -59,6 +61,8 @@ export const TacticsView: React.FC<Props> = ({
   onSaveTactics,
 }) => {
   const { t } = useTranslation();
+  const [inspectedPlayer, setInspectedPlayer] = useState<Player | null>(null);
+  const rosterById = useMemo(() => new Map(players.map(player => [String(player.id), player])), [players]);
 
   const formatDateTime = (dateStr?: string) => {
     if (!dateStr) return t('tactics.not_saved', 'Chưa lưu');
@@ -208,6 +212,7 @@ export const TacticsView: React.FC<Props> = ({
                 photo_url: p.photo_url || '/assets/players/default.png',
                 age: p.age || 20,
                 preferred_foot: p.preferred_foot || 'RIGHT',
+                status: p.status || p.player_status,
                 position: p.position || pos.formation_positions?.slot_code || 'MID',
                 overall_rating: p.overall_rating || 60,
                 squad_type: sqType,
@@ -239,6 +244,7 @@ export const TacticsView: React.FC<Props> = ({
                 photo_url: p.photo_url || '/assets/players/default.png',
                 age: p.age || 20,
                 preferred_foot: p.preferred_foot || 'RIGHT',
+                status: p.status || p.player_status,
                 position: p.position || 'MID',
                 overall_rating: p.overall_rating || 60,
                 squad_type: sqType,
@@ -682,7 +688,7 @@ export const TacticsView: React.FC<Props> = ({
   };
 
   // Save / Update Tactic to Database
-  
+
   // Chuyển đổi tuyến đội (Đội 1 <-> Đội trẻ U21)
   const handleSwitchSquadTab = async (targetSquad: 'FIRST_TEAM' | 'YOUTH_U21') => {
     if (targetSquad === activeSquadTab || !club?.id) return;
@@ -739,6 +745,7 @@ export const TacticsView: React.FC<Props> = ({
               photo_url: p.photo_url || '/assets/players/default.png',
               age: p.age || 20,
               preferred_foot: p.preferred_foot || 'RIGHT',
+                status: p.status || p.player_status,
               position: p.position || pos.formation_positions?.slot_code || 'MID',
               overall_rating: p.overall_rating || 60,
               squad_type: sqType,
@@ -763,6 +770,7 @@ export const TacticsView: React.FC<Props> = ({
                 photo_url: p.photo_url || '/assets/players/default.png',
                 age: p.age || 20,
                 preferred_foot: p.preferred_foot || 'RIGHT',
+                status: p.status || p.player_status,
                 position: p.position || 'MID',
                 overall_rating: p.overall_rating || 60,
               };
@@ -1077,14 +1085,17 @@ export const TacticsView: React.FC<Props> = ({
                           {getPlayerOvr(assignedPlayer)}
                         </span>
                       )}
+                      {assignedPlayer && <PlayerAvailabilityBadges player={assignedPlayer.status?.next_match !== undefined ? assignedPlayer : rosterById.get(String(assignedPlayer.id)) || assignedPlayer} compact onInspect={() => setInspectedPlayer(rosterById.get(String(assignedPlayer.id)) || assignedPlayer)} />}
                     </div>
 
                     <div className="token-info-pill">
                       <span className={`token-pos-tag ${posColor}`}>{pos.slot_code}</span>
-                      <span className="token-player-name" title={assignedPlayer?.name || pos.slot_code}>
+                      <button type="button" className="token-player-name player-profile-link" title={assignedPlayer?.name || pos.slot_code}
+                        onClick={event => { if (assignedPlayer) { event.stopPropagation(); setInspectedPlayer(rosterById.get(String(assignedPlayer.id)) || assignedPlayer); } }}>
                         {displayName}
-                      </span>
+                      </button>
                     </div>
+
                   </div>
                 );
               })}
@@ -1170,9 +1181,11 @@ export const TacticsView: React.FC<Props> = ({
                     {player ? (
                       <>
                         <div className="player-main-line">
-                          <strong className="player-name">{player.name}</strong>
+                          <button type="button" className="player-name player-profile-link" onClick={event => { event.stopPropagation(); setInspectedPlayer(rosterById.get(String(player.id)) || player); }}>{player.name}</button>
+                          <PlayerAvailabilityBadges player={player.status?.next_match !== undefined ? player : rosterById.get(String(player.id)) || player} onInspect={() => setInspectedPlayer(rosterById.get(String(player.id)) || player)} />
                           <span className="player-num">#{player.squad_number || '•'}</span>
                         </div>
+
                         <div className="player-sub-line">
                           <span>{t('tactics.role_pref', 'Sở trường:')} {getPlayerPos(player) || slot.slot_code}</span>
                         </div>
@@ -1273,9 +1286,11 @@ export const TacticsView: React.FC<Props> = ({
 
                           <div className="slot-player-info">
                             <div className="player-main-line">
-                              <strong className="player-name">{subPlayer.name}</strong>
+                              <button type="button" className="player-name player-profile-link" onClick={event => { event.stopPropagation(); setInspectedPlayer(rosterById.get(String(subPlayer.id)) || subPlayer); }}>{subPlayer.name}</button>
+                          <PlayerAvailabilityBadges player={subPlayer.status?.next_match !== undefined ? subPlayer : rosterById.get(String(subPlayer.id)) || subPlayer} onInspect={() => setInspectedPlayer(rosterById.get(String(subPlayer.id)) || subPlayer)} />
                               <span className="player-num">#{subPlayer.squad_number || '•'}</span>
                             </div>
+
                             <div className="player-sub-line">
                               <span>{t('tactics.role_pref', 'Sở trường:')} {getPlayerPos(subPlayer) || 'MID'} · {getPlayerOvr(subPlayer)} OVR</span>
                             </div>
@@ -1358,9 +1373,11 @@ export const TacticsView: React.FC<Props> = ({
 
                         <div className="bench-info">
                           <div className="player-main-line">
-                            <strong className="player-name">{bp.name}</strong>
+                            <button type="button" className="player-name player-profile-link" onClick={event => { event.stopPropagation(); setInspectedPlayer(rosterById.get(String(bp.id)) || bp); }}>{bp.name}</button>
+                          <PlayerAvailabilityBadges player={rosterById.get(String(bp.id)) || bp} onInspect={() => setInspectedPlayer(rosterById.get(String(bp.id)) || bp)} />
                             <span className="player-num">#{bp.squad_number || '•'}</span>
                           </div>
+
                           <span className="player-age-foot">
                             {t('tactics.age_years', '{age} tuổi').replace('{age}', String(bp.age || 20))} · {(bp as any).preferred_foot === 'LEFT' ? t('tactics.foot_left', 'Trái') : (bp as any).preferred_foot === 'BOTH' ? t('tactics.foot_both', '2 chân') : t('tactics.foot_right', 'Phải')}
                           </span>
@@ -1569,6 +1586,8 @@ export const TacticsView: React.FC<Props> = ({
           </div>
         </div>
       )}
+      {inspectedPlayer && <PlayerDetailModal player={inspectedPlayer} playersList={players} currentClubId={club?.id}
+        onClose={() => setInspectedPlayer(null)} onSelectPlayer={setInspectedPlayer} />}
     </div>
   );
 };
